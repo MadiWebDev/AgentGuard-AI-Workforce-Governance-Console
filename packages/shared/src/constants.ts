@@ -1,0 +1,1 @@
+export const MAX_BATCH = 500; export const MAX_BATCH_BYTES = 1024*1024; export const MAX_EVENT_BYTES = 16*1024; export const POLICY_P95_BUDGET_MS = 150; export const REPLAY_WINDOW_MS = 5*60*1000; export const PADDLE_TIMESTAMP_TOLERANCE_MS = 5*60*1000; export const VERSION = "1.0.0"; 

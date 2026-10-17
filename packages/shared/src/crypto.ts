@@ -1,0 +1,5 @@
+
+import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from "node:crypto";
+export function deriveKey(master: string): Buffer { return scryptSync(master, "agentguard-salt", 32); }
+export function encryptAESGCM(plaintext: string, masterKey: string, keyVersion = 1): { ciphertext: string; iv: string; tag: string; keyVersion: number } { const key=deriveKey(masterKey); const iv=randomBytes(12); const cipher=createCipheriv("aes-256-gcm", key, iv); const enc=Buffer.concat([cipher.update(plaintext,"utf8"), cipher.final()]); const tag=cipher.getAuthTag(); return { ciphertext: enc.toString("base64"), iv: iv.toString("base64"), tag: tag.toString("base64"), keyVersion }; }
+export function decryptAESGCM(enc: { ciphertext: string; iv: string; tag: string }, masterKey: string): string { const key=deriveKey(masterKey); const decipher=createDecipheriv("aes-256-gcm", key, Buffer.from(enc.iv,"base64")); decipher.setAuthTag(Buffer.from(enc.tag,"base64")); return Buffer.concat([decipher.update(Buffer.from(enc.ciphertext,"base64")), decipher.final()]).toString("utf8"); }
