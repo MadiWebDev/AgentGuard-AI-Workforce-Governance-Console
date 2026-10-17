@@ -9,3 +9,10 @@
 - Headers: CSP nonces (TODO prod), HSTS, frame-ancestors none, Referrer-Policy, Permissions-Policy.
 - SSRF: block private/loopback/link-local/metadata IPs, DNS re-check, redirect re-check.
 - Not legal advice / not a certification. Review audit-chain, policy, billing code before launch.
+
+## v1.1 security notes
+- Mock SAML: HMAC-signed assertions, audience+expiry+signature verified; mock SAML and MockKms are rejected when NODE_ENV=production. Never use mock adapters in production.
+- SCIM: Bearer token required; deprovision immediately revokes all sessions for the user.
+- BYOK: AES-256-GCM per-org key versions; old version revoked only after all packs re-encrypted. AWS/Cloudflare adapters throw NOT_CONFIGURED until real KMS credentials are configured; they make no live calls.
+- SIEM delivery: HMAC-SHA256 over {eventId, payload, timestamp}, 5-minute replay window, idempotency keys for exactly-once replay.
+- Red-team drafts and pack installs are DRAFT-only; activation is a separate audited action. No policy auto-activates.
