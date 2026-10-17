@@ -1,3 +1,19 @@
+## 1.3.0 — Ecosystem & Growth
+- C1 marketplace: trust scores from governance history only (never self-reported), publish threshold 60, verified badge 80 + chain verified, buyer onboarding creates a governed registry entry; staleness badge when scoring job is down.
+- C2 A2A governance: per-pair allow/deny/require-approval, content guards, exact-cent cost attribution (largest-remainder, sums exactly), message audit records linking the full trace.
+- C3 white-label: per-org brand (logo/colors/domain/branded email), client portal scoped to one org, leakCheck asserts no AgentGuard branding; custom-domain TLS documented in RUNBOOK.
+- C4 MSP console: cross-org alert rollup, per-client health scores (nightly recompute), delegated admins with scoped permissions, enforced cross-org isolation (adversarial test).
+- C5 client billing: integer-cent metering/invoices/margins reconciling to the penny; hand-rolled valid PDF invoices; invoices audit-logged.
+- C6 scheduled audits: weekly/monthly schedules, real control tests, signed evidence packs, email/portal delivery + delivery log; runDueSchedules test hook.
+- C7 warehouse sync: WarehouseSink (Postgres parameterized INSERTs + injected DbClient, FakeDbClient in tests), BigQuery/Snowflake NOT_CONFIGURED adapters, documented schema (docs/WAREHOUSE_SCHEMA.md), exactly-once backfill + buffered recovery.
+- C8 on-call: MockOnCall (dev/test, 503 in prod), PagerDuty/Opsgenie NOT_CONFIGURED adapters, SLA-breach escalation + decision resolution, round trip audit-logged.
+- C9 trust badge: Ed25519-signed badge payload, public verify endpoint (no auth), tamper fails, revoked orgs invalid, copy-paste HTML snippet.
+- C10 voice governance: STT provider interface (MockStt scripted fixtures dev/test, RealSttAdapter NOT_CONFIGURED), transcript enforcement + barge-in (warn/terminate), guardrail_triggered evidence with audio segment, PII-redacted transcripts, STT-down fail modes.
+- Golden extended to 59 checks (21 v1 + 15 v1.1 + 9 v1.2 + 13 v1.3 + 1 PROD; v1 count corrected — 5a–5f is 6 checks). Tests 105/105 (81 + 24 v1.3). Chaos rows: warehouse down (buffered/backfill/exactly-once), STT down (fail-mode), scoring job down (staleness badge).
+- Measured (scripts/bench-v13.ts): marketplace scoring 0.0004 ms/call, warehouse sync ~185k rows/s (in-memory fake sink), voice barge-in mean 0.02 ms / p95 0 ms (mock STT enforcement only; real STT latency UNVERIFIED).
+- Docs: API, SECURITY (marketplace gaming, A2A spoofing, white-label phishing, badge forgery, voice impersonation), COMPLIANCE, RUNBOOK (moderation, TLS, warehouse creds, PagerDuty/Opsgenie keys, STT keys), DECISIONS, VERIFICATION (R39–R48 + P1–P10 re-verified), PERFORMANCE, PROGRESS, README, WAREHOUSE_SCHEMA.md, .env.example.
+- Versions: root + web bumped to 1.3.0. Manual steps still open: marketplace moderation policy, custom-domain TLS + DNS ownership, warehouse credentials, PagerDuty/Opsgenie keys, STT provider keys (see RUNBOOK).
+
 ## 1.2.1 — Production hardening
 - Production env validation: fail-fast in production on missing/weak config or any mock adapter (DATABASE_URL, BETTER_AUTH_SECRET, APP_URL https non-localhost, ENCRYPTION_KEY, STORAGE_MODE, PADDLE_ENV, KMS_PROVIDER, ATTESTATION_ISSUER, SAML_MODE, SANDBOX_PROVIDER). Mock SAML / mock push rejected in production routes.
 - Security headers: CSP, HSTS (prod-only), Permissions-Policy added; `output: "standalone"` in next.config (matches Dockerfile CMD).

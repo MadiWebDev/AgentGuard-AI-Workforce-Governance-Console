@@ -2,7 +2,7 @@
 
 Log every agent action, enforce permissions and human approvals, track cost and reliability, and export tamper-evident, audit-ready evidence.
 
-**Current version: 1.2.0** — v1 core + v1.1 enterprise expansion + v1.2 autonomous governance & deep trust.
+**Current version: 1.3.0** — v1 core + v1.1 enterprise expansion + v1.2 autonomous governance & deep trust + v1.3 ecosystem & growth.
 
 ## What it does
 
@@ -43,6 +43,18 @@ Log every agent action, enforce permissions and human approvals, track cost and 
 - **Private peer benchmarking (A9)** — opt-in anonymized aggregates with differential privacy (epsilon budget 1.0/window), percentile bands, no org identifiable
 - **Full lineage tracking (A10)** — model/prompt/tool/policy/SDK versions on every trace, what-changed diffs, lineage block in evidence packs
 
+### v1.3 — Ecosystem & growth
+- **Agent marketplace (C1)** — publish agents with trust scores from governance history only (never self-reported); publish threshold 60, verified-governance badge at 80 + verified chain; one-click “govern this agent” onboarding
+- **A2A governance (C2)** — per-pair allow/deny/require-approval, content guards on payloads, exact-cent cost attribution across the chain, message audit records linking the full multi-agent trace
+- **White-label console (C3)** — per-org logo/colors/custom domain/branded emails, client portal scoped to one org, leak-checked branded output
+- **MSP multi-org console (C4)** — cross-org alert rollup, per-client health scores recomputed nightly, delegated admins with scoped permissions, enforced cross-org isolation
+- **Client billing (C5)** — per-client usage metering, invoice generation with a real PDF, margin reports reconciling to the penny in integer cents, audit-logged invoices
+- **Scheduled governance audits (C6)** — recurring weekly/monthly auto-audits: control tests + findings + signed evidence pack + email/portal delivery with delivery log
+- **Warehouse sync (C7)** — events/audit/costs to BigQuery, Snowflake, Postgres via `WarehouseSink`; documented schema; exactly-once backfill with progress
+- **On-call integrations (C8)** — PagerDuty/Opsgenie: SLA-breach escalation, decision resolution, round trip audit-logged
+- **Public trust badge (C9)** — Ed25519-signed “Governed by AgentGuard” embed, public verification endpoint, tamper fails, revoked orgs invalid
+- **Voice agent governance (C10)** — STT behind a provider interface, transcript policy enforcement, barge-in (warn/terminate) on violation, `guardrail_triggered` event with audio segment evidence, PII-redacted transcripts
+
 ## Quickstart
 
 ```bash
@@ -64,13 +76,13 @@ See [`docs/PRODUCTION_READINESS.md`](docs/PRODUCTION_READINESS.md) for the go / 
 ## Verification (real runs, not claims)
 
 ```bash
-pnpm verify:golden   # 44 checks: 20 v1 + 15 v1.1 + 9 v1.2 (A9 unit-tested by design — DP randomness)
-pnpm test            # 65/65 Vitest (25 v1 core + 12 v1.1 + 28 v1.2)
+pnpm verify:golden   # 59 checks: 21 v1 + 15 v1.1 + 9 v1.2 + 13 v1.3 + 1 PROD (A9 unit-tested by design — DP randomness)
+pnpm test            # 105/105 Vitest (25 v1 core + 12 v1.1 + 28 v1.2 + 16 prod + 24 v1.3)
 pnpm verify:all      # typecheck + lint + test + build + golden — must be green
-pnpm package         # produces agentguard-v1.2.0.zip (excludes node_modules, .next, dist, coverage, .env, zips)
+pnpm package         # produces agentguard-v1.3.0.zip (excludes node_modules, .next, dist, coverage, .env, zips)
 ```
 
-Gate table: R1–R38 in `docs/VERIFICATION.md` (R1–R18 v1, R19–R28 v1.1, R29–R38 v1.2). Measured numbers in `docs/PERFORMANCE.md`: stream-inspect overhead 0.45 ms/call, sandbox cold start 7 ms (LocalSandbox), autopilot 4 ms / 1000 decisions, collusion FPR 0 on 50 normal traces.
+Gate table: R1–R48 in `docs/VERIFICATION.md` (R1–R18 v1, R19–R28 v1.1, R29–R38 v1.2, R39–R48 v1.3). Measured numbers in `docs/PERFORMANCE.md`: stream-inspect overhead 0.45 ms/call, sandbox cold start 7 ms (LocalSandbox), autopilot 4 ms / 1000 decisions, collusion FPR 0 on 50 normal traces, marketplace scoring 0.0004 ms/call, warehouse sync ~185k rows/s (in-memory fake sink), voice barge-in mean 0.02 ms (mock STT enforcement only).
 
 ## Key API routes
 
@@ -89,6 +101,16 @@ Gate table: R1–R38 in `docs/VERIFICATION.md` (R1–R18 v1, R19–R28 v1.1, R29
 | `POST /api/v1/compliance/run`, `GET /api/v1/compliance/controls` | Control tests (A8) |
 | `POST /api/v1/benchmarks/publish` | DP peer benchmarks (A9) |
 | `POST /api/v1/lineage/diff` | Lineage diff (A10) |
+| `POST /api/v1/marketplace/publish`, `/buy` | Marketplace publish + buyer onboarding (C1) |
+| `POST /api/v1/a2a/send` | A2A message governance (C2) |
+| `GET/POST /api/v1/brand/[orgId]` | White-label brand (C3) |
+| `GET /api/v1/msp/overview`, `/clients` | MSP console (C4) |
+| `POST /api/v1/billing/clients/invoice` | Client invoice + margin (C5) |
+| `POST /api/v1/audits/schedule`, `/run-due` | Scheduled audits (C6) |
+| `POST /api/v1/warehouse/sync`, `/backfill` | Warehouse sync (C7) |
+| `POST /api/v1/oncall/incidents`, `/resolve` | On-call escalation (C8) |
+| `GET /api/badge/verify` | Public trust-badge verification (C9, no auth) |
+| `POST /api/v1/voice/check` | Voice governance + barge-in (C10) |
 | `GET /api/v1/openapi.json` | Generated OpenAPI spec |
 
 Full contract: `docs/API.md`. Standard error format everywhere: `{ error: { code, message, details, request_id } }`.
@@ -128,11 +150,11 @@ Production wiring still required (adapters are env-gated and documented, never f
 
 ## Docs
 
-- `docs/API.md`, `docs/SECURITY.md` (STRIDE incl. sandbox escape, attestation theft, collusion, timestamp spoofing), `docs/COMPLIANCE.md`, `docs/DECISIONS.md`, `docs/PERFORMANCE.md`, `docs/RUNBOOK.md`, `docs/VERIFICATION.md` (R1–R38), `docs/KNOWN_ISSUES.md`, `docs/COST_ESTIMATE.md`, `docs/OPERATOR_HANDBOOK.md`, `docs/ARCHITECTURE.md`, `docs/PROGRESS.md`
-- `CHANGELOG.md` — per-release entries (1.0.0, 1.1.0, 1.2.0)
+- `docs/API.md`, `docs/SECURITY.md` (STRIDE incl. sandbox escape, attestation theft, collusion, timestamp spoofing, marketplace gaming, A2A spoofing, white-label phishing, badge forgery, voice impersonation), `docs/COMPLIANCE.md`, `docs/DECISIONS.md`, `docs/PERFORMANCE.md`, `docs/RUNBOOK.md`, `docs/VERIFICATION.md` (R1–R48), `docs/KNOWN_ISSUES.md`, `docs/COST_ESTIMATE.md`, `docs/OPERATOR_HANDBOOK.md`, `docs/ARCHITECTURE.md`, `docs/PROGRESS.md`, `docs/WAREHOUSE_SCHEMA.md`
+- `CHANGELOG.md` — per-release entries (1.0.0, 1.1.0, 1.2.0, 1.2.1, 1.3.0)
 
 ## Honest limits
 
 - Live Docker/Firecracker execution, live SPIRE, live OpenTimestamps/EVM anchoring, live Paddle/Neon/Cloudinary/R2/Upstash/Inngest/Resend/AI, Playwright crawl, and k6 load tests were not run in the build VM — adapters + `NOT_CONFIGURED` behavior are tested; live-infra verification is listed as manual in `docs/VERIFICATION.md`.
-- `apps/web/package.json` still says 1.0.0 (root package is 1.2.0; pre-existing).
+- v1.3 live-service gaps (same pattern): no live BigQuery/Snowflake warehouse, no live PagerDuty/Opsgenie, no live STT provider, no live custom-domain TLS in the VM — adapters + `NOT_CONFIGURED` behavior tested; credentials/TLS are manual deployer steps.
 - The GitHub App used for pushes cannot write `.github/workflows/ci.yml` (403, needs workflow scope) — add it via the web UI or a local `git push`.
