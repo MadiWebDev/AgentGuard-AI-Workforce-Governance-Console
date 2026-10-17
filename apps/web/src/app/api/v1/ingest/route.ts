@@ -1,13 +1,19 @@
 import { z } from "zod";
-import { validateBatch, processBatch, authorize, ApiError, newRequestId } from "@agentguard/shared";
+import { validateBatch, processBatch, authorize, ApiError, newRequestId, RateLimiter } from "@agentguard/shared";
 import { store } from "@/server/store";
-import { ok, err } from "@/lib/api";
+import { ok, err, serverError, rateLimited } from "@/lib/api";
+const ingestLimiter = new RateLimiter(60, 60_000); // 60 ingest batches/min per key (in-memory fallback; production MUST set Upstash vars for a shared limiter — see RUNBOOK)
 const EventSchema = z.object({ traceId: z.string(), agentId: z.string(), type: z.string(), input: z.unknown().optional(), output: z.unknown().optional(), model: z.string().optional(), tokensIn: z.number().optional(), tokensOut: z.number().optional(), cachedTokens: z.number().optional(), costUsd: z.number().optional(), idempotencyKey: z.string().optional(), metadata: z.record(z.unknown()).optional() });
 export async function POST(req: Request){
   const rid = req.headers.get("x-request-id") ?? newRequestId();
   try {
     const apiKey = req.headers.get("x-api-key") ?? ""; const rec = apiKey ? store.findKey(apiKey) : undefined;
     if (apiKey && !rec) return err("UNAUTHORIZED", "Invalid API key", rid, 401);
+    const rlKey = apiKey || req.headers.get("x-forwarded-for") || "anon";
+    const rl = ingestLimiter.check(`ingest:${rlKey}`);
+    if (!rl.allowed) return rateLimited(rid, rl.retryAfterSec);
+    const contentLength = Number(req.headers.get("content-length") ?? 0);
+    if (contentLength > 1024 * 1024) return err("PAYLOAD_TOO_LARGE", "Ingest batch exceeds 1MB", rid, 413);
     const orgId = rec?.orgId ?? req.headers.get("x-org-id") ?? "org_demo";
     const body = await req.json().catch(()=>null);
     const parsed = z.object({ events: z.array(EventSchema) }).safeParse(body);
@@ -19,5 +25,5 @@ export async function POST(req: Request){
     for (const e of processed) store.events.push({ ...e, orgId, storedAt: new Date().toISOString() } as Record<string, unknown>);
     store.appendAudit(orgId, "event.ingested", { count: processed.length });
     return ok({ accepted: processed.length, redacted: processed.reduce((s,e)=>s+(e.redactionCount??0),0) }, rid, 202);
-  } catch (e) { if (e instanceof ApiError) return err(e.code, e.message, rid, e.status); return err("INTERNAL_ERROR", e instanceof Error?e.message:"error", rid, 500); }
+  } catch (e) { if (e instanceof ApiError) return err(e.code, e.message, rid, e.status); return serverError(rid, e); }
 }
