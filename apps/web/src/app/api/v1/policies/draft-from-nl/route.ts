@@ -1,0 +1,5 @@
+
+import { z } from "zod";
+import { draftPolicyFromUtterance } from "@agentguard/shared";
+import { ok, err, reqId } from "@/lib/api";
+export async function POST(req: Request) { const rid = reqId(req.headers); try { const body = await req.json().catch(() => ({})); const parsed = z.object({ utterance: z.string().min(1).max(500), recentEvents: z.array(z.object({ tool: z.string().optional(), cost: z.number().optional(), environment: z.string().optional(), riskTier: z.enum(["low", "medium", "high", "critical"]).optional() }).passthrough()).max(500).optional() }).safeParse(body); if (!parsed.success) return err("VALIDATION_ERROR", "Invalid NL draft request", rid, 400, parsed.error.issues); const res = draftPolicyFromUtterance(parsed.data.utterance, (parsed.data.recentEvents ?? []) as never, []); return ok(res, rid); } catch (e) { const code = (e as { code?: string }).code ?? "INTERNAL_ERROR"; return err(code, e instanceof Error ? e.message : "error", rid, code === "NL_NO_MATCH" ? 400 : 500); } }

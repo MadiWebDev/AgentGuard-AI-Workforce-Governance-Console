@@ -1,0 +1,5 @@
+
+import { z } from "zod";
+import { learnFromDecisions } from "@agentguard/shared";
+import { ok, err, reqId } from "@/lib/api";
+export async function POST(req: Request) { const rid = reqId(req.headers); try { const body = await req.json().catch(() => ({})); const parsed = z.object({ decisions: z.array(z.object({ action: z.string(), tool: z.string().optional(), environment: z.string().optional(), decision: z.enum(["approved", "rejected"]) }).passthrough()).max(10000), driftFindings: z.array(z.object({ agentId: z.string(), tool: z.string().optional(), dimension: z.string(), traceIds: z.array(z.string()) })).max(1000).optional() }).safeParse(body); if (!parsed.success) return err("VALIDATION_ERROR", "Invalid autopilot request", rid, 400, parsed.error.issues); const proposals = learnFromDecisions({ decisions: parsed.data.decisions as never, driftFindings: parsed.data.driftFindings ?? [] }); return ok({ proposals }, rid); } catch (e) { return err("INTERNAL_ERROR", e instanceof Error ? e.message : "error", rid, 500); } }
