@@ -1,0 +1,1 @@
+self.addEventListener("install",()=>self.skipWaiting());self.addEventListener("activate",()=>self.clients.claim());self.addEventListener("push",(e)=>{const d=e.data?e.data.json():{title:"AgentGuard"};e.waitUntil(self.registration.showNotification(d.title||"AgentGuard",{body:d.body||"Approval needed"}));});
