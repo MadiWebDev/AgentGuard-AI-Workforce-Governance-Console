@@ -1,0 +1,1 @@
+export default function Page(){ return (<div><h1 style={{fontSize:28}}>Legal — cookies</h1><p style={{color:"#475569",marginTop:8}}>LEGAL TEXT REQUIRED — Replace with counsel-reviewed text before launch.</p></div>); }

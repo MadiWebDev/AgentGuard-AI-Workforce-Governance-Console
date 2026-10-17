@@ -1,0 +1,1 @@
+export default function Page(){ return (<div><h1 style={{fontSize:28}}>Costs</h1><p style={{color:"#475569",marginTop:8}}>Spend by agent/model/provider/day, budgets, alerts, anomaly detection.</p></div>); }
