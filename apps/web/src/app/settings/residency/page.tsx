@@ -1,1 +1,9 @@
-export default function Page(){ return (<div><h1 style={{fontSize:28}}>Settings — Data Residency</h1><p style={{color:"#475569",marginTop:8}}>EU/US pinning. Payloads, evidence and exports stay in the org region bucket (eu-bucket / us-bucket). Cross-region reads return 403 and are audit-logged. Badge: region shown in the app header.</p></div>); }
+
+import { PageHeader, Card, EmptyState } from "@/components/m3";
+export default function Page() {
+  return (<div>
+    <PageHeader title="Settings — Data Residency" description="Region routing and storage: EU-only, US-only, or global per org. Violations are rejected at ingest." crumbs={[{ label: "Home", href: "/" }, { label: "Settings" }]} />
+    <Card title="Residency policy"><p className="m3-body-md" style={{margin:0}}>Set the residency region per org. Cross-region writes are rejected at ingest with RESIDENCY_VIOLATION.</p></Card>
+    <p className="m3-body-md" style={{ color:"var(--m3-on-surface-variant)"}}>Demo UI — mutations call authorize() on the server in production.</p>
+  </div>);
+}
