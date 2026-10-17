@@ -1,0 +1,1 @@
+export default function Page(){ return (<div><h1 style={{fontSize:28}}>Settings — security</h1><p style={{color:"#475569",marginTop:8}}>Settings section. Demo UI — mutations call authorize() on the server in production.</p></div>); }

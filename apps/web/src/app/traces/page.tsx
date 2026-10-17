@@ -1,0 +1,1 @@
+export default function Page(){ return (<div><h1 style={{fontSize:28}}>Traces</h1><p style={{color:"#475569",marginTop:8}}>Trace explorer: waterfall, filters, search, compare runs.</p></div>); }

@@ -1,0 +1,1 @@
+export default function Page(){ return (<div><h1 style={{fontSize:28}}>Support QA</h1><p style={{color:"#475569",marginTop:8}}>Ticket scoring, failed-resolution detection, KB fix suggestions.</p></div>); }
