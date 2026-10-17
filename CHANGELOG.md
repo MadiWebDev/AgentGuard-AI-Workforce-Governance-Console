@@ -1,3 +1,10 @@
+## 1.4.0 — Complete UI/UX Redesign (Material Design 3)
+- Full M3 design system: tokens (light + dark, indigo #4F46E5 seed), elevation, shape, type scale, motion with prefers-reduced-motion, state layers, density (comfortable/compact persisted in localStorage). Hand-built primitives (no new deps; shadcn/Radix were never installed). Dev-only /design gallery (404 in production).
+- Global shell: app bar (Cmd+K search, theme toggle, notification center, org switcher, user menu), nav rail, mobile bottom nav, drawer, breadcrumbs + PageHeader on every page, toasts, ConfirmDialog before destructive calls, skeletons, honest empty states, per-section error boundaries.
+- All 68 routes redesigned: marketing (hero, live policy-demo widget, MARKED testimonial placeholders), core (overview, agents, traces, policies), ops (approvals, audit, costs, alerts, reports, content, support), flows (onboarding wizard, verify-pack, auth, marketplace, A2A, brand, portal, MSP, billing/clients, audits, warehouse, on-call, voice, anchoring, attestation, sandbox, token-stream, autopilot, collusion, compliance, benchmarks, lineage, baseline, redteam, packs, runbooks, settings x11).
+- HARD RULE honored: no API route, response shape, domain logic, auth, billing, audit, or policy semantics changed. Auth demo buttons now show an honest env-gated notice instead of being dead (DECISIONS.md).
+- QA: token-pair contrast 11/11 PASS WCAG AA (light + dark, computed); HTTP crawl 68/69 routes 200 + /design 404-by-design; design test strengthened (PageHeader coverage, no fontSize:28). Screenshots / axe / Lighthouse UNVERIFIED — Playwright browser download blocked in VM (see PAGE_INVENTORY.md). Tests 112/112, golden 59/59, verify:all 6/6.
+
 ## 1.3.0 — Ecosystem & Growth
 - C1 marketplace: trust scores from governance history only (never self-reported), publish threshold 60, verified badge 80 + chain verified, buyer onboarding creates a governed registry entry; staleness badge when scoring job is down.
 - C2 A2A governance: per-pair allow/deny/require-approval, content guards, exact-cent cost attribution (largest-remainder, sums exactly), message audit records linking the full trace.

@@ -2,7 +2,7 @@
 
 Log every agent action, enforce permissions and human approvals, track cost and reliability, and export tamper-evident, audit-ready evidence.
 
-**Current version: 1.3.0** — v1 core + v1.1 enterprise expansion + v1.2 autonomous governance & deep trust + v1.3 ecosystem & growth.
+**Current version: 1.4.0** — v1 core + v1.1 enterprise expansion + v1.2 autonomous governance & deep trust + v1.3 ecosystem & growth + v1.4 Material Design 3 redesign.
 
 ## What it does
 
@@ -55,6 +55,12 @@ Log every agent action, enforce permissions and human approvals, track cost and 
 - **Public trust badge (C9)** — Ed25519-signed “Governed by AgentGuard” embed, public verification endpoint, tamper fails, revoked orgs invalid
 - **Voice agent governance (C10)** — STT behind a provider interface, transcript policy enforcement, barge-in (warn/terminate) on violation, `guardrail_triggered` event with audio segment evidence, PII-redacted transcripts
 
+### v1.4 — Complete UI/UX redesign (Material Design 3)
+- **Design system** — M3 color roles (indigo `#4F46E5` seed, true dark theme), elevation, shape, type scale, motion with `prefers-reduced-motion`, state layers, density (comfortable/compact in Settings → Security, persisted in `localStorage`). No new dependencies; primitives hand-built. Dev-only `/design` gallery (404 in production).
+- **Global shell** — app bar with Cmd+K search, theme toggle, notification center, org switcher, user menu; nav rail on desktop, bottom nav on mobile, drawer for deep nav; PageHeader + breadcrumbs on every page.
+- **Every page redesigned** — all 68 routes: marketing, core dashboards, ops queues, and all flows. Confirm dialogs before destructive calls, skeletons, honest empty states, per-section error boundaries. No API, response-shape, domain-logic, auth, billing, audit, or policy-semantics change.
+- **Design QA** — token-pair contrast 11/11 PASS WCAG AA (light + dark); HTTP crawl 68/69 routes 200 + `/design` 404-by-design. Screenshots / axe / Lighthouse UNVERIFIED in the build VM (Playwright browser download blocked) — see `docs/design/PAGE_INVENTORY.md`.
+
 ## Quickstart
 
 ```bash
@@ -77,9 +83,9 @@ See [`docs/PRODUCTION_READINESS.md`](docs/PRODUCTION_READINESS.md) for the go / 
 
 ```bash
 pnpm verify:golden   # 59 checks: 21 v1 + 15 v1.1 + 9 v1.2 + 13 v1.3 + 1 PROD (A9 unit-tested by design — DP randomness)
-pnpm test            # 105/105 Vitest (25 v1 core + 12 v1.1 + 28 v1.2 + 16 prod + 24 v1.3)
+pnpm test            # 112/112 Vitest (25 v1 core + 12 v1.1 + 28 v1.2 + 16 prod + 24 v1.3 + 7 v1.4 design)
 pnpm verify:all      # typecheck + lint + test + build + golden — must be green
-pnpm package         # produces agentguard-v1.3.0.zip (excludes node_modules, .next, dist, coverage, .env, zips)
+pnpm package         # produces agentguard-v1.4.0.zip (excludes node_modules, .next, dist, coverage, .env, zips)
 ```
 
 Gate table: R1–R48 in `docs/VERIFICATION.md` (R1–R18 v1, R19–R28 v1.1, R29–R38 v1.2, R39–R48 v1.3). Measured numbers in `docs/PERFORMANCE.md`: stream-inspect overhead 0.45 ms/call, sandbox cold start 7 ms (LocalSandbox), autopilot 4 ms / 1000 decisions, collusion FPR 0 on 50 normal traces, marketplace scoring 0.0004 ms/call, warehouse sync ~185k rows/s (in-memory fake sink), voice barge-in mean 0.02 ms (mock STT enforcement only).
@@ -151,7 +157,7 @@ Production wiring still required (adapters are env-gated and documented, never f
 ## Docs
 
 - `docs/API.md`, `docs/SECURITY.md` (STRIDE incl. sandbox escape, attestation theft, collusion, timestamp spoofing, marketplace gaming, A2A spoofing, white-label phishing, badge forgery, voice impersonation), `docs/COMPLIANCE.md`, `docs/DECISIONS.md`, `docs/PERFORMANCE.md`, `docs/RUNBOOK.md`, `docs/VERIFICATION.md` (R1–R48), `docs/KNOWN_ISSUES.md`, `docs/COST_ESTIMATE.md`, `docs/OPERATOR_HANDBOOK.md`, `docs/ARCHITECTURE.md`, `docs/PROGRESS.md`, `docs/WAREHOUSE_SCHEMA.md`
-- `CHANGELOG.md` — per-release entries (1.0.0, 1.1.0, 1.2.0, 1.2.1, 1.3.0)
+- `CHANGELOG.md` — per-release entries (1.0.0, 1.1.0, 1.2.0, 1.2.1, 1.3.0, 1.4.0)
 
 ## Honest limits
 
