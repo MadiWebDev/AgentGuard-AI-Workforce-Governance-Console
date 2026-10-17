@@ -1,0 +1,4 @@
+title = "gitleaks"
+[allowlist]
+description = "allow example secrets"
+paths = ['''\.env\.example$''']
