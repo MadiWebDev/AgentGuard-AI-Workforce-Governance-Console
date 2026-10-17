@@ -61,11 +61,23 @@ importers:
         specifier: 5.9.3
         version: 5.9.3
 
-  packages/mcp-server: {}
+  packages/mcp-server:
+    devDependencies:
+      '@types/node':
+        specifier: 22.10.2
+        version: 22.10.2
 
-  packages/sdk-ts: {}
+  packages/sdk-ts:
+    devDependencies:
+      '@types/node':
+        specifier: 22.10.2
+        version: 22.10.2
 
-  packages/shared: {}
+  packages/shared:
+    devDependencies:
+      '@types/node':
+        specifier: 22.10.2
+        version: 22.10.2
 
 packages:
 
