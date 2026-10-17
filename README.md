@@ -57,6 +57,10 @@ Health: http://localhost:3000/api/health · Ready: /api/ready · OpenAPI: /api/v
 
 Copy `.env.example` to `.env` and fill in values. Never commit real secrets. When `DATABASE_URL` is unset, the app runs against an in-memory store (same interfaces) for local dev/tests; see `docs/DECISIONS.md` for the adapter choices.
 
+## Production readiness
+
+See [`docs/PRODUCTION_READINESS.md`](docs/PRODUCTION_READINESS.md) for the go / no-go checklist (P1–P10). Short version: the code is CODE-READY — it fails fast on dangerous configs — but launch still needs your accounts, env vars, infra, a human security review, and legal counsel. Check `/api/ready` on the production host: it must return 200 with `mode: "database"`.
+
 ## Verification (real runs, not claims)
 
 ```bash

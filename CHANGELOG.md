@@ -1,3 +1,16 @@
+## 1.2.1 — Production hardening
+- Production env validation: fail-fast in production on missing/weak config or any mock adapter (DATABASE_URL, BETTER_AUTH_SECRET, APP_URL https non-localhost, ENCRYPTION_KEY, STORAGE_MODE, PADDLE_ENV, KMS_PROVIDER, ATTESTATION_ISSUER, SAML_MODE, SANDBOX_PROVIDER). Mock SAML / mock push rejected in production routes.
+- Security headers: CSP, HSTS (prod-only), Permissions-Policy added; `output: "standalone"` in next.config (matches Dockerfile CMD).
+- Error handling: unknown 500s are generic in production; `errorResponse(..., isProduction)` strips 500 messages. All API routes audited.
+- Honest readiness: `/api/ready` returns 503 when prod env invalid or store unreachable; dev reports `mode: "memory-dev"`.
+- Safe logging helpers (`safeLogEvent` / `safeLogMessage`) that redact PII before logging.
+- Rate limiting: shared token-bucket `RateLimiter`, per-key enforcement on ingest (60/min), policy/check (300/min), gateway (60/min), 429 + Retry-After; ingest 1MB cap enforced with 413.
+- Secrets hygiene: `scripts/secret-scan.mjs` wired into `verify:all`; `.gitignore` covers `*.pem`, `*.key`, `id_rsa*`; fixed hardcoded `POSTGRES_PASSWORD` in docker-compose (now env var with dev-only default).
+- Dockerfile: removed non-frozen `pnpm install` fallback (fail fast).
+- Data lifecycle contract: retention cutoff/expired ids, 30-day org-deletion grace, GDPR export shape (PII-redacted).
+- `pnpm audit`: UNVERIFIED in build VM (registry proxy 403 on audit endpoints) — run with registry access before launch.
+- Versions: root + web bumped to 1.2.1.
+
 ## 1.2.0
 - A1 token-stream inspection, A2 sandboxed tool execution, A3 attestation, A4 NL policy authoring, A5 autopilot, A6 collusion detection, A7 anchoring, A8 compliance monitoring, A9 DP benchmarking, A10 lineage tracking.
 - Prep fix: regenerated pnpm-lock.yaml (frozen-install mismatch fixed; clean-room frozen install + typecheck + build now pass).

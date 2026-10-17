@@ -11,3 +11,6 @@ coverage/
 .storage/
 .pnpm-store/
 *.tsbuildinfo
+*.pem
+*.key
+id_rsa*
