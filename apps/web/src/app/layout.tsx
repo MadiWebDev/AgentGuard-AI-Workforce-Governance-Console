@@ -1,5 +1,24 @@
-import "./globals.css"; import Link from "next/link"; import type { ReactNode } from "react";
-export const metadata = { title: "AgentGuard — AI Workforce Governance", description: "Log every agent action, enforce permissions and human approvals, track cost and reliability, export audit-ready evidence." };
+import "./globals.css";
+import type { ReactNode } from "react";
+import { AppShell } from "@/components/shell";
+import { SectionErrorBoundary } from "@/components/m3";
+
+export const metadata = {
+  title: "AgentGuard — AI Workforce Governance",
+  description: "Log every agent action, enforce permissions and human approvals, track cost and reliability, export audit-ready evidence.",
+};
+export const viewport = { width: "device-width", initialScale: 1 };
+
+/** M3 global shell: app bar (search, theme, notifications, org switcher, user menu),
+ *  navigation rail (desktop), bottom nav (mobile), drawer (deep nav). */
 export default function RootLayout({ children }: { children: ReactNode }) {
-  return (<html lang="en"><body><header style={{borderBottom:"1px solid #e2e8f0",padding:"12px 20px",display:"flex",gap:20,alignItems:"center"}}><Link href="/" style={{fontWeight:800}}>AgentGuard</Link><nav style={{display:"flex",gap:14,fontSize:14}}><Link href="/pricing">Pricing</Link><Link href="/docs">Docs</Link><Link href="/overview">App</Link><Link href="/onboarding">Onboarding</Link><Link href="/verify-pack">Verify Pack</Link><Link href="/redteam">Red Team</Link><Link href="/packs">Packs</Link><Link href="/runbooks">Runbooks</Link><Link href="/baseline">Baselines</Link><Link href="/settings/residency">Residency</Link></nav><span style={{marginLeft:"auto",fontSize:12}}>Demo data clearly marked · No live secrets · Residency: EU/US pinned</span></header><main style={{maxWidth:1100,margin:"0 auto",padding:24}}>{children}</main><footer style={{textAlign:"center",padding:24,fontSize:12,color:"#64748b"}}>AgentGuard v1.1.0 · <Link href="/legal/terms">Terms</Link> · <Link href="/legal/privacy">Privacy</Link> · <Link href="/security">Security</Link></footer></body></html>);
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <SectionErrorBoundary section="app shell">
+          <AppShell>{children}</AppShell>
+        </SectionErrorBoundary>
+      </body>
+    </html>
+  );
 }
