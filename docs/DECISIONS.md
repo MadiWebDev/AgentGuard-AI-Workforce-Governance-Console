@@ -32,3 +32,12 @@
 - Benchmarking: epsilon total 1.0/window, 0.25/query; seeded mulberry32 RNG in tests for determinism; production callers should seed from crypto randomness.
 - Lineage: lineageHash binds lineage into the signed manifest via a lineage.json manifest entry.
 - Lockfile prep fix (v1.2-prep): see v1.2 start in PROGRESS.md.
+
+## v1.2.1 production hardening
+- Production env validation is fail-fast with an aggregated error (all blocking issues listed at once) rather than one-at-a-time; mock adapters are detected via explicit env flags (STORAGE_MODE, KMS_PROVIDER, ATTESTATION_ISSUER, SAML_MODE, SANDBOX_PROVIDER). Upstash absence is a warning, not a boot failure, because rate limiting has a documented in-memory fallback; production MUST still set Upstash vars for a shared limiter.
+- 500 error messages are generic in production (`Internal error`); controlled ApiError codes (4xx/503) keep their messages. Remaining `e.message` uses in routes are controlled 4xx/503 codes only.
+- Rate limits (ingest 60/min, policy/check 300/min, gateway 60/min per key) are starting defaults, chosen to be safe for a small launch; tune with real traffic + Upstash.
+- CSP uses `style-src 'unsafe-inline'` because Tailwind/inline styles need it; everything else is `'self'`-scoped with `frame-ancestors 'none'`. HSTS is production-only (prevents localhost dev breakage).
+- Dockerfile uses `output: "standalone"` to match the CMD; the `|| pnpm install` fallback was removed (lockfile is now in sync since the v1.2 prep fix).
+- `pnpm audit` could not run in the build VM (registry proxy 403 on the audit endpoints) — recorded UNVERIFIED, not invented.
+- Version policy: root + web both 1.2.1 for this patch release; other packages keep their own 1.0.0 versions (unchanged scope).

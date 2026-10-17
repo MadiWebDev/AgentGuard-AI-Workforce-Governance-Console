@@ -3,7 +3,8 @@ services:
     image: postgres:16
     environment:
       POSTGRES_USER: agentguard
-      POSTGRES_PASSWORD: agentguard
+      # Dev-only default. Production MUST set POSTGRES_PASSWORD in the environment (never commit a real password).
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-agentguard-dev-only}
       POSTGRES_DB: agentguard
     ports: ["5432:5432"]
     volumes: [pgdata:/var/lib/postgresql/data]

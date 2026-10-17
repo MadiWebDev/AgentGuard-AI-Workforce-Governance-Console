@@ -36,3 +36,15 @@
 - Sandbox provider down: fail-closed for sandbox actions, clear error; other actions unaffected.
 - Attestation issuer down: fail per agent fail-mode (fail-open: allow + audit; fail-closed: deny).
 - Timestamping service down: anchor queued, retried, marked pending — never silently skipped.
+
+## Production hardening (v1.2.1)
+### Production boot check
+- On boot (and on `/api/ready`), `validateProductionEnv()` fails fast in production for the full list in PRODUCTION_READINESS.md P1. Fix the named variable and restart; do not bypass.
+### Rate limiting
+- In-memory token bucket per process: ingest 60/min/key, policy/check 300/min/key, gateway 60/min/key. Production MUST set `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` for a shared limiter; until then, limits are per-instance and restarts reset buckets. 429 responses carry `Retry-After`.
+### Data lifecycle / GDPR
+- Retention: purge rows older than the plan cutoff (`retentionCutoffIso` / `expiredEventIds` in `packages/shared/src/lifecycle.ts`) via a scheduled job against the production DB. Free 7d / Pro 30d / Team 90d / Enterprise 365d.
+- GDPR export: `buildOrgExport()` — redact every event payload with `redactObject` before filling the export; never export raw PII.
+- Org deletion: `requestOrgDeletion()` starts a 30-day grace period; delete rows only after `deletionDue()` is true. Keep the audit trail of the deletion request itself.
+### Secrets
+- Run `node scripts/secret-scan.mjs` in CI (wired into `pnpm verify:all`). Never commit `.env`, `*.pem`, `*.key`.

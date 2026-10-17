@@ -58,3 +58,16 @@ Manual verification required: live Paddle/Neon/Cloudinary/R2/Upstash/Inngest/Res
 - Sandbox provider down: fail-closed for sandbox actions, clear error (Docker/Firecracker NOT_CONFIGURED behavior; live provider failure UNVERIFIED without Docker).
 - Attestation issuer down: fail per agent fail-mode (v12 A3 test: fail-open allows + audits, fail-closed denies).
 - Timestamping service down: anchor queued, retried, marked pending — never silently skipped (v12 A7 test).
+
+## Production gates (P1–P10) — v1.2.1
+- P1 Production env validation: PASS (validateProductionEnv + assertProductionEnv; prod.test.ts; golden PROD check).
+- P2 Security headers: PASS (CSP, HSTS prod-only, Permissions-Policy, nosniff, referrer, frame deny; config test; build green with `output: "standalone"`).
+- P3 Secrets hygiene: PASS (secret-scan wired into verify:all, scan clean; .gitignore covers .env*/pem/key; compose password fixed).
+- P4 Error handling: PASS (serverError/formatServerError generic 500s in prod; 24 routes audited; remaining e.message uses are controlled 4xx/503 codes).
+- P5 Ready honesty: PASS (getReadiness; /api/ready 503 on invalid prod env / unreachable store; dev reports memory-dev mode).
+- P6 Logging without PII: PASS (safeLogEvent/safeLogMessage redact via PII pipeline; test asserts raw values absent; no other logger in src/).
+- P7 Rate limits + payload limits: PASS in-memory (token bucket; ingest 60/min + 1MB 413; policy/check 300/min; gateway 60/min; 429 + Retry-After). Production MUST set Upstash vars for a shared limiter.
+- P8 Dependency audit: UNVERIFIED — `pnpm audit` blocked by registry proxy 403 on audit endpoints in this VM. Run with registry access before launch.
+- P9 Dockerfile/compose/CI: PASS code (multi-stage, non-root, no secrets in image, fail-fast frozen install, standalone CMD match; compose env password). CI file still NOT on GitHub (App 403) — remaining manual step.
+- P10 Data lifecycle: PASS contract (retentionCutoff/expiredEventIds, 30-day deletion grace, GDPR export shape; live deletion is a deployer DB operation per RUNBOOK).
+- R1–R38: re-verified via the same verify:all run (golden 45/45 incl. new PROD check + tests 81/81).

@@ -1,5 +1,21 @@
 # Progress
 
+## Production-ready start (v1.2.1)
+- Start HEAD: d1fe4b9 (v1.2.0 tag fbcab5c + README e2ce245 + web version d1fe4b9). `pnpm verify:all` green before hardening (PASS 5/5: secret-scan not yet wired).
+- Audit findings (verified by reading code, not assumed):
+  - REAL GAPS: (1) env validation only rejected STORAGE_MODE=local in prod — no DATABASE_URL/secret/APP_URL/ENCRYPTION_KEY/mock checks; (2) next.config missing CSP, HSTS, Permissions-Policy; `output: "standalone"` missing while Dockerfile CMD referenced `standalone/server.js`; (3) 24 API routes leaked `e.message` on 500s; (4) `/api/ready` was a static always-ready stub; (5) no logger at all (no PII logging, but also no safe-logging helper); (6) zero per-key rate limiting on ingest/policy-check/gateway; ingest had no byte-size enforcement in-route; (7) docker-compose hardcoded `POSTGRES_PASSWORD: agentguard`; (8) `.gitignore` missing `*.pem`/`*.key`; (9) Dockerfile had a non-frozen `pnpm install` fallback; (10) retention/GDPR existed only in docs, no code contract.
+  - ALREADY FINE: no hardcoded high-confidence secrets in code (secret grep clean except the compose password above); PII redaction before storage; hash-chained audit; `pnpm install --frozen-lockfile` clean-room PASS (v1.2 prep fix); no `any` in domain code; no skipped tests.
+  - UNVERIFIED: `pnpm audit` — registry proxy 403 on audit endpoints (exact blocker in PRODUCTION_READINESS.md P8).
+- Dockerfile CMD bug caught during verification: with `output: "standalone"` the server lands at `.next/standalone/apps/web/server.js` in this monorepo, but the old CMD pointed at `apps/web/.next/standalone/server.js` (would fail on boot). Fixed: runner copies the standalone tree + static + public, CMD is `node apps/web/server.js`. `docker build` itself remains UNVERIFIED (no Docker in VM).
+- Plan: fix the 10 gaps above, keep all 44 golden checks passing (+1 prod gate), `verify:all` green, tag v1.2.1, package zip. Local commits only.
+
+## Production-ready complete (v1.2.1)
+- verify:all green 6/6 (secret-scan + typecheck + lint + test + build + golden). Tests 81/81 (65 + 16 new prod tests). Golden 45/45 (44 + 1 PROD env gate).
+- Production gates P1–P10 in docs/VERIFICATION.md: P1–P7, P9 (code), P10 PASS; P8 UNVERIFIED (pnpm audit blocked by registry proxy 403); P9 CI still NOT on GitHub (App 403) — remaining manual step.
+- Version: root + web both 1.2.1. Tag v1.2.1 (annotated, local only). Zip agentguard-v1.2.1.zip via scripts/package.sh; clean-room test recorded in the v1.2.1 report.
+- Remaining manual steps (NOT done): push tags, add CI to GitHub, accounts/env/Paddle/Vercel, infra (sandbox/SPIRE/OTS), human security review, legal counsel, pnpm audit with registry access, live verification (Docker build, SPIRE, OTS/EVM, Paddle checkout, Playwright, k6).
+
+
 ## v1.2 start
 - v1.1.0 commit 10a2e6aa57cacb4b1af32288df8702307dfd6ec8, base green (`pnpm verify:all` PASS 5/5 before feature work).
 - Prep fix: lockfile mismatch FIXED. Root cause: `pnpm-lock.yaml` listed `packages/mcp-server`, `packages/sdk-ts`, `packages/shared` as `{}` but their tsconfigs (via base `types:["node"]`) need `@types/node@22.10.2` as devDep. `pnpm install --lockfile-only` in a /tmp copy regenerated the lockfile (+24 lines, only that addition). Clean-room `pnpm install --frozen-lockfile && pnpm typecheck && pnpm build` now PASS (previously BLOCKED). Commit: `fix(v1.2-prep): regenerate lockfile`.
