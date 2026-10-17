@@ -1,1 +1,18 @@
-export default function Page(){ return (<div><h1 style={{fontSize:28}}>magic-link</h1><form className="card" style={{maxWidth:420,marginTop:12}}><label>Email<input className="input" placeholder="you@company.com" /></label><br/><br/><label>Password<input className="input" type="password" /></label><br/><br/><button className="btn" type="button">Continue (demo — wire Better Auth in production)</button><p style={{fontSize:12,color:"#64748b",marginTop:8}}>Auth is env-gated. In production use Better Auth + org plugin. Demo form does not create a session.</p></form></div>); }
+"use client";
+import { useState } from "react";
+import { AuthShell } from "@/components/auth";
+
+export default function Page() {
+  const [notice, setNotice] = useState<string | null>(null);
+  return (
+    <AuthShell title="Magic link sign-in" subtitle="We'll email you a one-time sign-in link." alt={{ label: "Prefer a password? Sign in", href: "/login" }}>
+      <form onSubmit={(e) => { e.preventDefault(); setNotice("Demo form — magic-link delivery is env-gated (Resend in production). No email is sent."); }}>
+        <label className="m3-label" htmlFor="magic-email">Email</label>
+        <input id="magic-email" className="m3-input" placeholder="you@company.com" type="email" autoComplete="email" required />
+        <button className="m3-btn m3-btn-filled" type="submit" style={{ width: "100%", marginTop: 20 }}>Send magic link</button>
+        <p className="m3-body-sm" style={{ color: "var(--m3-on-surface-variant)", marginTop: 12 }}>The link expires after first use. Check spam if it does not arrive.</p>
+        {notice && <p className="m3-body-md" role="status" style={{ marginTop: 12 }}>{notice}</p>}
+      </form>
+    </AuthShell>
+  );
+}
