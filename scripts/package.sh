@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-VERSION=${VERSION:-1.3.0}
+VERSION=${VERSION:-1.4.0}
 OUT="agentguard-v${VERSION}.zip"
 rm -f "$OUT"
 # Use python zip to exclude node_modules/.next/dist/coverage/.env/zips
