@@ -66,3 +66,9 @@
 - Follows the configured fail mode: fail-closed blocks the leg; fail-open continues UNGOVERNED and flagged.
 ### Marketplace scoring job down (chaos)
 - Listings keep their last-known score with a staleness badge (stale after 24h) — never a silently fresh-looking score.
+
+## v1.4 runbooks — theme & density
+- Theme: light/dark toggle in the app bar. Persisted per-device in localStorage (`ag-theme`); falls back to `prefers-color-scheme`. No server-side setting, no cookie — a user who switches devices re-picks their theme.
+- Density: Settings → Security → Display density (comfortable / compact), persisted per-device in localStorage (`ag-density`). Affects spacing only.
+- First-paint note: no inline theme script (CSP `script-src 'self'` blocks inline scripts), so the first paint may briefly show the light theme before the stored theme applies. Accepted tradeoff; recorded in DECISIONS.md.
+- Designer review: still a manual step — review on a real device at 360 / 768 / 1024 / 1440 / 1920, plus a browser screenshot pass (Playwright was blocked in the build VM). Real customer testimonials still needed to replace the MARKED placeholders on the marketing page.

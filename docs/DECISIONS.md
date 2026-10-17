@@ -1,5 +1,23 @@
 # Decisions
 
+## v1.4 design decisions
+- HARD RULE: no behavior change. API routes, response shapes, domain logic in packages/shared, auth, billing, audit, policy semantics are untouched. Only visual + UX-flow changes. Flow improvements (shell nav, drawers, stepper, confirm-before-destructive-call) recorded here with before/after.
+- Brand seed: indigo #4F46E5 (no canonical brand color existed — the old CSS used slate #0f172a for buttons). M3 light + dark roles derived from this seed; documented in docs/design/TOKENS.md.
+- Fonts: system stack styled to the M3 type scale (Inter/Plus Jakarta Sans first in the stack when installed, IBM Plex Mono for code/keys when installed). NO external font CDN — the CSP is `font-src 'self' data:` and a CDN would violate it. No new font dependency; next/font/google would download at build time and fails offline, so the system stack is the honest choice.
+- shadcn/ui + Radix were NOT actually installed in this repo (no components.json, no @/components/ui, no Radix deps). Adding them would be a framework/dependency change, so M3 primitives are hand-built in apps/web/src/components/ to M3 specs instead. No new CSS framework, no new deps.
+- Theme: `.dark` class on <html>, toggled by a client ThemeProvider reading localStorage + prefers-color-scheme. No inline theme script (CSP `script-src 'self'` blocks inline scripts) — a brief first-paint flash to light theme is the accepted tradeoff; theme persists in localStorage (`ag-theme`) and density in `ag-density`.
+- /design gallery is dev-only: renders 404 when NODE_ENV === "production" (via notFound()), never exposed in production.
+- Testimonials on marketing: placeholders are visibly MARKED as placeholders, no fake customer names/logos/stats. The hero stats ticker is labeled "demo" unless fed by a real API response.
+- Confirm-before-destructive: pause/quarantine/revoke/delete actions now show a ConfirmDialog BEFORE the existing API call fires. The API call itself is unchanged; only the confirmation step was added.
+- Destructive-action, wizard-stepper, drawer-vs-page, and bottom-sheet-on-mobile changes are UX-flow only; underlying routes/calls unchanged.
+- Screenshots/axe/Lighthouse: attempted with real tools; if the VM blocks browser install or a tool, the item is recorded UNVERIFIED with the exact blocker — never fabricated.
+- D6 PageHeader exemptions: the marketing home (hero pattern) and the 4 auth pages (AuthShell centered-card pattern) do not use PageHeader. The design test encodes exactly these 5 exemptions; every other page uses PageHeader. Forcing PageHeader into the hero/auth layouts would worsen those layouts, not improve them.
+- D6 auth demo buttons: login/signup/magic-link/verify-2fa submit buttons were dead (type="button", no handler, form with no action). They now submit the form client-side and show an honest inline notice ("Demo form — auth is env-gated … No session is created") instead of doing nothing. "Use a magic link instead" is now a real link to /magic-link. No auth behavior changed: no session is created, no email is sent, no account is created — the notice says so. Recorded because a visual fix (dead button) touched the auth flow's UX.
+- D6 QA tooling outcome: Playwright browser download timed out twice (cdn.playwright.dev unreachable/slow in VM); axe-core and Lighthouse not installed and would need the same blocked download. Screenshots/axe/Lighthouse are UNVERIFIED with that blocker; substitute evidence used instead (token-pair contrast computed from globals.css, HTTP crawl of all routes, static checks for div-onClick / fixed widths). No screenshots, axe scores, or Lighthouse numbers are claimed.
+- Token naming: inverse pair is `--m3-inverse-on-surface` / `--m3-inverse-surface` (M3-correct), not `on-inverse-surface`. Contrast script initially looked up the wrong key and reported MISSING; corrected to the real token names (light 11.65, dark 10.17, both PASS AA).
+
+## v1.3 decisions
+
 - Node 22, Next 14.2, React 18, TypeScript strict, Zod, Vitest.
 - Runtime works without live Postgres/Redis: MemoryStore when DATABASE_URL unset. Drizzle schema documents production tables; Neon adapter is a documented production step, not faked live.
 - Better Auth / Paddle / Inngest / Upstash / Cloudinary / R2 / Resend / AI providers: typed adapter interfaces + env-gated local adapters (local disk, console email, in-memory queue/cache). Local adapters REJECTED in production (see src/lib/env.ts assertProductionAdapters + docs).

@@ -1,5 +1,33 @@
 # Progress
 
+## v1.4 start
+- Base: v1.3.0 commit c64f30f (tag v1.3.0). Root + web package.json both 1.3.0. v1.4 builds on v1.3.0; no prior work redone.
+- Baseline: `pnpm verify:all` green before redesign (6/6: secret-scan + typecheck + lint + test + build + golden 59/59). Clean tree, remote https://github.com/MadiWebDev/AgentGuard-AI-Workforce-Governance-Console.git. Local commits + tags only (no token in VM; parent pushes via GitHub MCP).
+- Plan: M3 design system (D1) -> global shell (D2) -> marketing (D3) -> core pages (D4) -> ops pages (D5) -> flows + remaining pages (D6) -> version 1.4.0. Per-batch commits + tags `design-N-<area>`, final tag v1.4.0. Local git only.
+- HARD RULE: functionality, APIs, data identical. Visual + UX-flow changes only. Flow improvements recorded in DECISIONS.md.
+
+## v1.4 D1 — design system (commit e3731a1, tag design-1-tokens)
+- M3 tokens (globals.css), Tailwind token mapping, m3.tsx primitives, shell.tsx, charts.tsx, /design dev-only gallery, TOKENS.md, PAGE_INVENTORY.md (68 routes), design.test.ts (7 tests). Gates green.
+
+## v1.4 D2 — global shell (commit 2c1832a, tag design-2-shell)
+- layout.tsx rewritten: AppShell (app bar, Cmd+K search, theme toggle, notification center, org switcher, user menu), nav rail, mobile bottom nav, drawer, SectionErrorBoundary. Marketing routes hide rail/bottom nav. Gates green.
+
+## v1.4 D3 — marketing (commit 167496d, tag design-3-marketing)
+- Home (hero mesh, live policy-demo widget, feature grid, MARKED testimonial placeholders, FAQ), pricing, docs, changelog, security, legal x5 (LEGAL TEXT REQUIRED placeholders kept). Gates green.
+
+## v1.4 D4 — core pages (commit 699fe12, tag design-4-core)
+- Overview, agents, agents/[id], traces, traces/[id], policies, policies/[id], policies/nl — real fetches to existing APIs, ConfirmDialog before destructive calls. Gates green.
+
+## v1.4 D5 — ops pages (commit 21fc0d6, tag design-5-ops)
+- Approvals, approvals/[id], approvals/[id]/mobile (offline queue), audit, costs, alerts, reports, content, support. Gates green.
+
+## v1.4 D6 — flows + remaining pages (commit c54a553, tag design-6-flows)
+- Onboarding, verify-pack, auth (AuthShell + 4 auth pages), marketplace, a2a, brand, portal/[orgId], msp, billing/clients, audits, warehouse, oncall, voice, anchoring, attestation, sandbox, token-stream, autopilot, collusion, compliance, benchmarks, lineage, baseline, redteam, packs, runbooks, settings x11 (incl. density toggle in settings/security persisted to localStorage ag-density).
+- Fixes during D6 QA: settings pages regenerated via script had f-string brace damage (crumbs/style) — fixed via sed + full rewrite of security page; compliance passRate missing paren; marketplace Card missing children; home feature-icon fontSize:28 replaced with m3-headline-md class; auth demo buttons made honestly live (inline env-gated notice) instead of dead.
+- Design test strengthened: PageHeader coverage enforced on all pages except 5 documented exemptions; no fontSize:28 in any page.
+- QA evidence: token-pair contrast 11/11 pairs PASS WCAG AA both themes (computed from globals.css); HTTP crawl 68/69 routes 200 + /design 404-by-design in production; zero div/span onClick; zero fixed widths >= 1000px. Screenshots / axe / Lighthouse UNVERIFIED (Playwright browser download timed out twice — cdn.playwright.dev blocked/slow in VM; axe/Lighthouse not installed). See docs/design/PAGE_INVENTORY.md.
+- Environment note: the VM service restarted mid-D6 and wiped the global pnpm install (outside ~); reinstalled pnpm@10.34.7 via npm before continuing. No repo files were affected.
+
 ## v1.3 start
 - v1.2.0 commit fbcab5c (tag v1.2.0). Actual base: v1.2.1 commit cf36559 (tag v1.2.1) — includes v1.2.0 + README + web-version + prod hardening. v1.3 builds on v1.2.1; v1.2.1 work is NOT redone.
 - Baseline: `pnpm verify:all` green before feature work (6/6: secret-scan + typecheck + lint + test + build + golden 45/45). Clean tree, remote https://github.com/MadiWebDev/AgentGuard-AI-Workforce-Governance-Console.git. Local commits + tags only (no token in VM; parent pushes via GitHub MCP).

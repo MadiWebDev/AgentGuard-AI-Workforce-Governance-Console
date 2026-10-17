@@ -90,3 +90,10 @@ Manual verification required: live Paddle/Neon/Cloudinary/R2/Upstash/Inngest/Res
 - Warehouse sink down: rows buffer (BufferedWarehouseSync), flush on recovery, dedupe on idempotency keys — never lost, never double-written (v13 C7 test: buffered → flush path + duplicate backfill writes 0).
 - STT provider down: fail per configured mode — fail-closed blocks the call leg; fail-open continues UNGOVERNED only when explicitly configured and is always flagged ungoverned (v13 C10 test).
 - Marketplace scoring job down: listings show last-known score with staleness badge (stale after 24h) — never a silently fresh-looking score (v13 C1 test).
+
+## v1.4 verification (design gates D1–D6)
+- D1–D6 gates: `pnpm typecheck && pnpm lint && pnpm test && pnpm build` green after every batch (D1 e3731a1, D2 2c1832a, D3 167496d, D4 699fe12, D5 21fc0d6, D6 this commit).
+- Design test: 7/7 in apps/web/tests/design.test.ts — tokens declare core M3 roles, Tailwind maps tokens, /design 404 in production, no page contains raw "no data", shell components exist, PageHeader coverage (5 documented exemptions), no fontSize:28 in any page.
+- Tests 112/112 (105 + 7 design). Golden 59/59 unchanged — v1.4 changes no behavior, so no new golden checks were needed.
+- P1–P10: re-verified via verify:all — CSP unchanged (no font CDN, no new external sources), headers intact, secret-scan clean. P8 pnpm audit still UNVERIFIED (registry 403, same as before).
+- Design QA: token-pair contrast 11/11 PASS WCAG AA (light + dark, computed from globals.css); HTTP crawl 68/69 routes 200 + /design 404-by-design; zero div/span onClick; zero fixed widths >= 1000px. Screenshots / axe / Lighthouse UNVERIFIED — Playwright browser download timed out (cdn.playwright.dev blocked/slow in VM); see docs/design/PAGE_INVENTORY.md.
