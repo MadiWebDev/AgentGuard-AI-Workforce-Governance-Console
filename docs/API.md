@@ -45,3 +45,20 @@ Error format: { error: { code, message, details, request_id } }. Deprecation: v1
 - POST /api/v1/benchmarks/publish — {orgs, epsilonPerQuery?} → {aggregates, epsilonSpent, budgetAfter}; DP budget exhaustion → 429 DP_BUDGET_EXHAUSTED.
 - POST /api/v1/lineage/diff — {old, new} → {changedFields, changes, summary}.
 - Error format unchanged: {error:{code,message,details,request_id}}.
+
+## v1.3 endpoints
+- POST /api/v1/marketplace/publish — {agent, history} → listing (403 TRUST_THRESHOLD below score 60).
+- POST /api/v1/marketplace/buy — {listing, buyerOrgId} → governed registry entry in buyer org (audit-logged).
+- POST /api/v1/a2a/send — {traceId, fromAgent, toAgent, payload, costUsd?, policy?, chainWeights?} → {check, delivered, audit} with exact-cent cost attribution.
+- GET/POST /api/v1/brand/[orgId] — white-label brand config; rendered output leak-checked (no AgentGuard strings).
+- GET /api/v1/msp/overview — cross-org alert rollup + health scores for orgs the caller may access.
+- GET /api/v1/msp/clients — recomputed per-client health scores.
+- POST /api/v1/billing/clients/invoice — {clientOrgId, clientName, period, eventCount, rateCentsPerEvent, taxRateBps?, clientRevenueCents?, agentGuardCostCents?} → invoice (integer cents, PDF base64) + optional margin; audit-logged.
+- POST /api/v1/audits/schedule — {orgId, cadence: weekly|monthly} → schedule.
+- POST /api/v1/audits/run-due — {nowMs?} → runs due schedules (control tests + signed pack + delivery log).
+- POST /api/v1/warehouse/sync — {kind: events|audit|costs, rows[]} → {written, duplicates} (exactly-once).
+- POST /api/v1/warehouse/backfill — {history: {events, audit, costs}} → {total, written, percent}.
+- POST /api/v1/oncall/incidents — {approval, approverId} → incident (400 when SLA not breached; mock provider dev/test-only).
+- POST /api/v1/oncall/resolve — {incidentId, decision} → resolved incident; round trip audit-logged.
+- GET /api/badge/verify — PUBLIC, no auth. Query: orgId, agentId, trustScore, issuedAt, signature, publicKey → {valid, reason}.
+- POST /api/v1/voice/check — {audioBase64, policies[], segmentId?, orgId?} → {enforcement, evidence, latencyMs}; violation triggers barge-in + guardrail_triggered audit.

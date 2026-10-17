@@ -41,3 +41,16 @@
 - Dockerfile uses `output: "standalone"` to match the CMD; the `|| pnpm install` fallback was removed (lockfile is now in sync since the v1.2 prep fix).
 - `pnpm audit` could not run in the build VM (registry proxy 403 on the audit endpoints) — recorded UNVERIFIED, not invented.
 - Version policy: root + web both 1.2.1 for this patch release; other packages keep their own 1.0.0 versions (unchanged scope).
+
+## v1.3 decisions
+- Trust score weights: approvalCompliance*40 + uptime*30 + clean-history base 30 − min(20, incidents*2) − min(10, violations*1), clamped 0..100. Publish threshold 60, verified badge 80 + chain verified. Stale after 24h (last-known score + staleness badge when the scoring job is down).
+- A2A cost attribution in integer cents with largest-remainder rounding so per-agent splits sum EXACTLY to the total. Content guards: regex + PII-class; a guard hit blocks delivery regardless of pair action.
+- White-label: brand validation requires #rrggbb colors, http(s) logo, email From; custom domains must be public hostnames with a TLD. leakCheck stringifies rendered output and asserts no "AgentGuard".
+- MSP: access enforced in requireAccess (throws FORBIDDEN); health score = compliance*60 + 40 − min(25, alerts*2) − min(15, incidents*3).
+- Client billing: ALL money integer cents; tax via integer basis points (rounded once); PDF via a hand-rolled minimal PDF 1.4 writer (no heavy dep) producing a real %PDF file with xref table.
+- Scheduled audits reuse v1.2 runControlTests + Ed25519 evidence manifests; delivery adapters: console (dev/test-only, throws in prod), email/portal NOT_CONFIGURED stubs.
+- Warehouse: PostgresSink executes parameterized INSERTs with ON CONFLICT DO NOTHING against an injected DbClient; tests use FakeDbClient. BigQuery/Snowflake adapters throw NOT_CONFIGURED. Backfill is exactly-once via sink-level idempotency dedupe + DB conflict guard.
+- On-call: MockOnCall in-memory for dev/test (503 in prod routes); PagerDuty/Opsgenie adapters throw NOT_CONFIGURED without keys (documented stubs, no live calls).
+- Trust badge: Ed25519 (same pattern as evidence manifests) chosen over HMAC so verification is public-key based with no shared secret. Caveat documented in SECURITY.md: the public verify endpoint takes a caller-supplied publicKey; production should pin keys from org records.
+- Voice: MockStt decodes base64 `script:<transcript>` fixtures (dev/test-only, 503 in prod); RealSttAdapter throws NOT_CONFIGURED without STT_PROVIDER/STT_API_KEY. Barge-in actions: warn | terminate. STT-down fail-open is explicit-only and always flagged ungoverned.
+- v1.3 in-memory server state (brands, schedules, on-call, warehouse fake) lives in apps/web/src/server/v13-store.ts for dev/test; production persists in Postgres (manual migration step).
