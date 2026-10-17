@@ -1,0 +1,1 @@
+export default function Page(){ return (<div><h1 style={{fontSize:28}}>Approvals</h1><p style={{color:"#475569",marginTop:8}}>Approval queue: SLA, routing, escalation, bulk actions, 2-person for critical.</p></div>); }

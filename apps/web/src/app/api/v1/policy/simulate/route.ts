@@ -1,0 +1,5 @@
+import { z } from "zod";
+import { evaluatePolicy, newRequestId } from "@agentguard/shared";
+import { store } from "@/server/store";
+import { ok, err } from "@/lib/api";
+export async function POST(req: Request){ const rid=req.headers.get("x-request-id")??newRequestId(); try{ const body=await req.json().catch(()=>null); const parsed=z.object({ rules: z.array(z.object({ id: z.string(), action: z.enum(["allow","deny","require_approval","rate_limit","spend_cap","content_guard"]), priority: z.number(), toolGlob: z.string().optional(), costThreshold: z.number().optional() })), events: z.array(z.record(z.unknown())).default([]) }).safeParse(body); if(!parsed.success) return err("VALIDATION_ERROR","Invalid simulate",rid,400,parsed.error.issues); const diffs=parsed.data.events.map(e=>({ event:e, decision: evaluatePolicy(parsed.data.rules as never, { tool: String((e as Record<string,unknown>).tool ?? ""), cost: Number((e as Record<string,unknown>).cost ?? 0) }) })); return ok({ diffs }, rid); }catch(e){ return err("INTERNAL_ERROR", e instanceof Error?e.message:"error", rid, 500); } }

@@ -1,0 +1,1 @@
+export default function Page(){ return (<div><h1 style={{fontSize:28}}>Audit Log</h1><p style={{color:"#475569",marginTop:8}}>Append-only hash chain. Verification shows 'chain verified at [time]' or first broken row.</p></div>); }

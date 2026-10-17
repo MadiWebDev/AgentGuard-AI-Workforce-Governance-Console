@@ -1,0 +1,1 @@
+export default function Page(){ return (<div><h1 style={{fontSize:28}}>Changelog</h1><p style={{color:"#475569",marginTop:8}}>v1.0.0 — Initial release: golden path, ingest, policy, approvals, audit, costs, billing adapters, add-ons, SDKs, MCP.</p></div>); }

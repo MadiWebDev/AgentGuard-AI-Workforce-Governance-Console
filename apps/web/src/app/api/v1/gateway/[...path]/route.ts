@@ -1,0 +1,6 @@
+import { newRequestId, evaluatePolicy } from "@agentguard/shared";
+import { store } from "@/server/store";
+import { ok, err } from "@/lib/api";
+async function handler(req: Request, ctx:{params:{path:string[]}}){ const rid=req.headers.get("x-request-id")??newRequestId(); const apiKey=req.headers.get("x-api-key")??""; const rec=apiKey?store.findKey(apiKey):undefined; if(apiKey&&!rec) return err("UNAUTHORIZED","Invalid key",rid,401); const orgId=rec?.orgId ?? "org_demo"; const rules=[...store.policies.values()].filter(p=>p.orgId===orgId&&p.status==="active").flatMap(p=>p.rules); const dec=evaluatePolicy(rules,{tool:ctx.params.path.join("/")}); if(dec.decision==="deny") return ok({ decision:"deny", reason: dec.reason }, rid, 403); store.events.push({ orgId, type:"llm_call", traceId:`gw_${Date.now()}`, agentId: rec?.agentId ?? "unknown", storedAt: new Date().toISOString() }); return ok({ gateway: "passthrough-note", note: "No upstream provider key configured — gateway logged the call and ran policy check. Configure OPENAI_API_KEY/ANTHROPIC_API_KEY for live forwarding.", path: ctx.params.path, decision: dec }, rid); }
+export async function POST(req: Request, ctx:{params:{path:string[]}}){ return handler(req, ctx); }
+export async function GET(req: Request, ctx:{params:{path:string[]}}){ return handler(req, ctx); }

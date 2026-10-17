@@ -1,0 +1,3 @@
+import { NextResponse } from "next/server";
+const spec = { openapi: "3.1.0", info: { title: "AgentGuard API", version: "1.0.0" }, paths: { "/api/v1/ingest": { post: { summary: "Ingest batch" } }, "/api/v1/policy/check": { post: { summary: "Policy check" } }, "/api/v1/agents": { get: { summary: "List agents" }, post: { summary: "Create agent" } }, "/api/v1/approvals": { get: { summary: "List approvals" }, post: { summary: "Request approval" } }, "/api/v1/audit/verify": { get: { summary: "Verify audit chain" } }, "/api/v1/costs/summary": { get: { summary: "Cost summary" } }, "/api/v1/evidence-packs": { post: { summary: "Generate evidence pack" } } } };
+export async function GET(){ return NextResponse.json(spec); }

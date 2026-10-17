@@ -1,0 +1,1 @@
+export default function Page(){ return (<div><h1 style={{fontSize:28}}>Approval Detail</h1><p style={{color:"#475569",marginTop:8}}>Full context, approve/reject with mandatory comment.</p></div>); }
