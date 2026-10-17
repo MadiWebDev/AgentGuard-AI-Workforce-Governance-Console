@@ -1,0 +1,1 @@
+export default function Page(){ return (<div><h1 style={{fontSize:28}}>Policy Packs</h1><p style={{color:"#475569",marginTop:8}}>Prebuilt versioned packs: EU AI Act oversight, SOC 2 baseline, finance DLP, support QA starter. Install creates DRAFT policies + simulation; activation is a separate audited action.</p></div>); }

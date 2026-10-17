@@ -1,0 +1,1 @@
+export default function Page(){ return (<div><h1 style={{fontSize:28}}>Baselines & Drift</h1><p style={{color:"#475569",marginTop:8}}>Nightly baselines: tools, cost/run mean/std, latency p50/p95, error rate. Drift alerts fire when |z| exceeds 3, linked to trace ids.</p></div>); }

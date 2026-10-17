@@ -1,0 +1,1 @@
+export default function Page(){ return (<div><h1 style={{fontSize:28}}>Settings — Data Residency</h1><p style={{color:"#475569",marginTop:8}}>EU/US pinning. Payloads, evidence and exports stay in the org region bucket (eu-bucket / us-bucket). Cross-region reads return 403 and are audit-logged. Badge: region shown in the app header.</p></div>); }

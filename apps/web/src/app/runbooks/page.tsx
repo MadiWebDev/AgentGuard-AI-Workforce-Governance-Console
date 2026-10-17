@@ -1,0 +1,1 @@
+export default function Page(){ return (<div><h1 style={{fontSize:28}}>Runbooks</h1><p style={{color:"#475569",marginTop:8}}>Compromised-agent runbook: quarantine → revoke keys → freeze approvals → notify → open incident evidence pack. Run via POST /api/v1/runbooks/compromised-agent.</p></div>); }

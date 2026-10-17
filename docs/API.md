@@ -21,3 +21,14 @@ Base: /api/v1. Auth: agent key via x-api-key (scopes ingest, policy:check) or se
 | GET | /api/sse/approvals, /api/sse/traces | SSE |
 
 Error format: { error: { code, message, details, request_id } }. Deprecation: v1 stable; breaking changes -> v2 with 6-month notice.
+
+## v1.1 endpoints
+- POST /api/v1/sso/login — mock-SAML login (test-only; rejected in production). Body: {assertion, secret, issuer, audience, requireSSO?, passwordLogin?}.
+- GET/POST /api/scim/v2/Users, GET/PATCH/DELETE /api/scim/v2/Users/[id] — SCIM v2, Bearer auth (SCIM_TOKEN env, default `scim-test-token` in dev/test). DELETE deprovisions + revokes sessions.
+- GET/POST /api/v1/residency — region bucket/queue; POST migrates region (verified).
+- POST /api/v1/redteam/run — {mode: strict|permissive} → {checks, findings, score, drafts}.
+- POST /api/v1/siem/endpoints, /api/v1/siem/deliver, /api/v1/siem/replay, GET /api/v1/siem/deliveries.
+- POST /api/v1/runbooks/compromised-agent — {agentId, pendingApprovalIds?, stakeholderEmails?}.
+- GET /api/v1/packs, POST /api/v1/packs/install, POST /api/v1/packs/activate.
+- POST /api/v1/push/subscribe — {userId, endpoint, payload?} (mock push in dev/test).
+- Error format unchanged: {error:{code,message,details,request_id}}.

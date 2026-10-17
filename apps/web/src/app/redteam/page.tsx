@@ -1,0 +1,1 @@
+export default function Page(){ return (<div><h1 style={{fontSize:28}}>Red Team</h1><p style={{color:"#475569",marginTop:8}}>Attack library: prompt injection, jailbreak, PII exfiltration, tool misuse, cost-burn loops. Run via POST /api/v1/redteam/run. Findings produce DRAFT policies only — never auto-activated.</p></div>); }
