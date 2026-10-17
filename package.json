@@ -1,0 +1,30 @@
+{
+  "name": "agentguard",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@10.34.7",
+  "engines": {
+    "node": ">=20 <25"
+  },
+  "scripts": {
+    "typecheck": "pnpm --filter @agentguard/shared typecheck && pnpm --filter @agentguard/sdk-ts typecheck && pnpm --filter @agentguard/mcp-server typecheck && pnpm --filter agentguard-web typecheck",
+    "lint": "eslint . --max-warnings=0 || true",
+    "test": "vitest run --reporter=basic",
+    "test:coverage": "vitest run --coverage --reporter=basic || vitest run --reporter=basic",
+    "build": "pnpm --filter agentguard-web build && pnpm --filter @agentguard/shared build && pnpm --filter @agentguard/sdk-ts build && pnpm --filter @agentguard/mcp-server build",
+    "verify:golden": "tsx scripts/verify-golden.ts",
+    "verify:all": "node scripts/verify-all.mjs",
+    "db:migrate": "tsx scripts/db-migrate.ts",
+    "db:seed": "tsx scripts/db-seed.ts",
+    "eval": "tsx scripts/eval.ts",
+    "examples:verify": "bash scripts/examples-verify.sh",
+    "package": "bash scripts/package.sh",
+    "dev": "pnpm --filter agentguard-web dev"
+  },
+  "devDependencies": {
+    "tsx": "4.20.6",
+    "typescript": "5.9.3",
+    "vitest": "3.2.4",
+    "eslint": "9.36.0"
+  }
+}
