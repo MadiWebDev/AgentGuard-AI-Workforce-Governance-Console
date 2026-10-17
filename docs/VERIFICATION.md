@@ -71,3 +71,22 @@ Manual verification required: live Paddle/Neon/Cloudinary/R2/Upstash/Inngest/Res
 - P9 Dockerfile/compose/CI: PASS code (multi-stage, non-root, no secrets in image, fail-fast frozen install, standalone CMD match; compose env password). CI file still NOT on GitHub (App 403) — remaining manual step.
 - P10 Data lifecycle: PASS contract (retentionCutoff/expiredEventIds, 30-day deletion grace, GDPR export shape; live deletion is a deployer DB operation per RUNBOOK).
 - R1–R38: re-verified via the same verify:all run (golden 45/45 incl. new PROD check + tests 81/81).
+
+## v1.3 verification (R39–R48)
+- R39 Marketplace (C1): golden C1 + v13 C1 PASS (publish below threshold → TRUST_THRESHOLD; seeded incidents lower score; buyer onboarding creates governed registry entry; self-reported fields ignored).
+- R40 A2A (C2): golden C2 + v13 C2 PASS (denied pair cannot exchange; approved-with-conditions logs conditions; content guard blocks; cost split sums exactly to total in integer cents).
+- R41 White-label (C3): golden C3 + v13 C3 PASS (branded render carries brand + leakCheck clean; invalid domain rejected; portal data scoped to one org).
+- R42 MSP (C4): golden C4 + v13 C4 PASS (MSP admin sees all assigned clients; client admin blocked from org B by enforced accessor; health score recomputes on changed inputs; rollup aggregates).
+- R43 Client billing (C5): golden C5 + v13 C5 PASS (seeded usage → hand-computed invoice 700 + 70 tax = 770; margins reconcile to the penny; PDF starts %PDF with %%EOF).
+- R44 Scheduled audits (C6): golden C6 + v13 C6 PASS (due schedule runs end-to-end in test time: findings + signed pack + delivery log; not-due schedules do not run).
+- R45 Warehouse (C7): golden C7 + v13 C7 PASS (seeded events land in test sink with documented schema; backfill counts match; duplicate backfill writes 0 — exactly-once).
+- R46 On-call (C8): golden C8 + v13 C8 PASS (SLA breach → mock incident; decision resolves; round trip audit-logged; PagerDuty adapter NOT_CONFIGURED).
+- R47 Trust badge (C9): golden C9 + v13 C9 PASS (badge verifies; tampered payload fails; revoked org invalid; snippet contains embed link).
+- R48 Voice (C10): golden C10 + v13 C10 PASS (seeded violating utterance → barge-in terminate + guardrail_triggered + redacted transcript + audio evidence; clean utterance passes; STT-down fail modes; real STT NOT_CONFIGURED).
+- R1–R38: re-verified via the same verify:all run (golden 59/59 incl. 13 new v1.3 check lines + PROD check; tests 105/105).
+- P1–P10: re-verified via the same verify:all run — P1–P7, P9 (code), P10 PASS; P8 UNVERIFIED (pnpm audit still blocked by registry proxy 403, same as v1.2.1); P9 CI still NOT on GitHub (App 403) — remaining manual step. New v1.3 routes keep prod gates: mock on-call/voice/warehouse adapters return 503 in production; mock STT rejected in prod.
+
+## v1.3 chaos rows
+- Warehouse sink down: rows buffer (BufferedWarehouseSync), flush on recovery, dedupe on idempotency keys — never lost, never double-written (v13 C7 test: buffered → flush path + duplicate backfill writes 0).
+- STT provider down: fail per configured mode — fail-closed blocks the call leg; fail-open continues UNGOVERNED only when explicitly configured and is always flagged ungoverned (v13 C10 test).
+- Marketplace scoring job down: listings show last-known score with staleness badge (stale after 24h) — never a silently fresh-looking score (v13 C1 test).

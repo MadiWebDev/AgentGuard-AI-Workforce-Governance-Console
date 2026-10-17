@@ -48,3 +48,21 @@
 - Org deletion: `requestOrgDeletion()` starts a 30-day grace period; delete rows only after `deletionDue()` is true. Keep the audit trail of the deletion request itself.
 ### Secrets
 - Run `node scripts/secret-scan.mjs` in CI (wired into `pnpm verify:all`). Never commit `.env`, `*.pem`, `*.key`.
+
+## v1.3 runbooks
+### Marketplace moderation
+1. Review new listings: trust score ≥ 60 is automatic, but a human moderator should spot-check listings with sudden history improvements (possible history gaming). 2. Revoked/suspended sellers: remove listings + add org to the badge revocation list (revoked orgs verify as invalid). 3. Marketplace moderation policy itself is a manual step — write it before opening the marketplace to third-party sellers.
+### Custom-domain TLS
+1. Org sets a DNS CNAME from their domain (e.g. console.client.com) to the AgentGuard console host. 2. Deployer verifies DNS ownership (TXT record) before serving the brand on that domain. 3. Provision a TLS certificate (Vercel automatic certs, or ACME via the hosting provider). 4. No live TLS is performed or verified in the build VM — this is a deployer step.
+### Warehouse credentials
+- Postgres: set WAREHOUSE_DATABASE_URL to a Postgres DSN with INSERT on warehouse_events / warehouse_audit / warehouse_costs (schema in docs/WAREHOUSE_SCHEMA.md). Production routes return 503 without it. BigQuery: BIGQUERY_PROJECT_ID + BIGQUERY_DATASET + BIGQUERY_CREDENTIALS. Snowflake: SNOWFLAKE_ACCOUNT + SNOWFLAKE_USER + SNOWFLAKE_PASSWORD + SNOWFLAKE_WAREHOUSE. Adapters throw NOT_CONFIGURED until configured.
+### PagerDuty / Opsgenie keys
+- PagerDuty: PAGERDUTY_API_KEY + PAGERDUTY_SERVICE_ID. Opsgenie: OPSGENIE_API_KEY. Until configured, on-call routes use the dev/test-only MockOnCall and return 503 in production. SLA-breach incidents page the on-call approver; the approver's decision resolves the incident.
+### STT provider keys
+- STT_PROVIDER=real + STT_API_KEY for a real STT provider. Until configured, voice routes use the dev/test-only MockStt (scripted transcripts) and return 503 in production. STT-down: fail-closed blocks the call leg; fail-open continues UNGOVERNED only when explicitly configured and flagged.
+### Warehouse sink down (chaos)
+- Rows buffer (BufferedWarehouseSync), flush on recovery, and dedupe on idempotency keys — never lost, never double-written.
+### STT provider down (chaos)
+- Follows the configured fail mode: fail-closed blocks the leg; fail-open continues UNGOVERNED and flagged.
+### Marketplace scoring job down (chaos)
+- Listings keep their last-known score with a staleness badge (stale after 24h) — never a silently fresh-looking score.

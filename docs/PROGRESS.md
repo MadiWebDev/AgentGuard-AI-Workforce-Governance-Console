@@ -1,6 +1,30 @@
 # Progress
 
-## Production-ready start (v1.2.1)
+## v1.3 start
+- v1.2.0 commit fbcab5c (tag v1.2.0). Actual base: v1.2.1 commit cf36559 (tag v1.2.1) — includes v1.2.0 + README + web-version + prod hardening. v1.3 builds on v1.2.1; v1.2.1 work is NOT redone.
+- Baseline: `pnpm verify:all` green before feature work (6/6: secret-scan + typecheck + lint + test + build + golden 45/45). Clean tree, remote https://github.com/MadiWebDev/AgentGuard-AI-Workforce-Governance-Console.git. Local commits + tags only (no token in VM; parent pushes via GitHub MCP).
+- Plan: 10 features C1–C10 in 3 waves, per-batch commits + tags `feature-cN-<slug>`, final tag v1.3.0. Local git only.
+
+## v1.3 Wave 1 — C1 Marketplace, C2 A2A, C3 White-label
+- C1–C3 shared modules + API routes + UI pages. Tags: feature-c1-marketplace, feature-c2-a2a, feature-c3-whitelabel. Commit c19a6fe.
+- Gates on working tree: shared typecheck PASS, v13 tests 24/24 PASS (after 3 test-caught fixes: trust-threshold seed below cap, NOT_CONFIGURED adapters made async so throws become rejections, golden C8 shared-object mutation).
+
+## v1.3 Wave 2 — C4 MSP, C5 Client billing, C6 Scheduled audits
+- C4–C6 shared modules + API routes + UI pages. Tags: feature-c4-msp, feature-c5-clientbilling, feature-c6-scheduledaudits. Commit 3fe655c.
+
+## v1.3 Wave 3 — C7 Warehouse, C8 On-call, C9 Badge, C10 Voice
+- C7–C10 shared modules + API routes + UI pages + shared index exports + v13 tests + golden extension + bench script. Tags: feature-c7-warehouse, feature-c8-oncall, feature-c9-badge, feature-c10-voice. Commit 29f6a63.
+- One typecheck fix in this wave: MSP overview duplicate `orgId` key in object literal.
+
+## v1.3 final
+- verify:all green 6/6 (secret-scan + typecheck + lint + test + build + golden). Tests 105/105 (81 + 24 v1.3). Golden 59/59 (21 v1 + 15 v1.1 + 9 v1.2 + 13 v1.3 + 1 PROD; v1 count corrected — 5a–5f is 6 checks, prior docs said 20).
+- Measured (scripts/bench-v13.ts): marketplace scoring 0.0004 ms/call, warehouse sync ~185k rows/s (in-memory fake sink), voice barge-in mean 0.02 ms / p95 0 ms (mock STT enforcement only).
+- Root + web version 1.3.0; package.sh produces agentguard-v1.3.0.zip. Tag: v1.3.0 (annotated, local only).
+- Known limits: live BigQuery/Snowflake, live PagerDuty/Opsgenie, live STT, live custom-domain TLS — UNVERIFIED in VM (adapters + NOT_CONFIGURED behavior tested). Badge public-verify endpoint takes a caller-supplied publicKey — production must pin keys from org records (see SECURITY.md). v1.3 server state (brands, schedules, on-call, warehouse fake) is in-memory dev/test; production persists in Postgres (manual migration step).
+- Remaining manual steps (NOT done): push tags, marketplace moderation policy, custom-domain TLS + DNS ownership, warehouse credentials, PagerDuty/Opsgenie keys, STT provider keys.
+
+
+
 - Start HEAD: d1fe4b9 (v1.2.0 tag fbcab5c + README e2ce245 + web version d1fe4b9). `pnpm verify:all` green before hardening (PASS 5/5: secret-scan not yet wired).
 - Audit findings (verified by reading code, not assumed):
   - REAL GAPS: (1) env validation only rejected STORAGE_MODE=local in prod — no DATABASE_URL/secret/APP_URL/ENCRYPTION_KEY/mock checks; (2) next.config missing CSP, HSTS, Permissions-Policy; `output: "standalone"` missing while Dockerfile CMD referenced `standalone/server.js`; (3) 24 API routes leaked `e.message` on 500s; (4) `/api/ready` was a static always-ready stub; (5) no logger at all (no PII logging, but also no safe-logging helper); (6) zero per-key rate limiting on ingest/policy-check/gateway; ingest had no byte-size enforcement in-route; (7) docker-compose hardcoded `POSTGRES_PASSWORD: agentguard`; (8) `.gitignore` missing `*.pem`/`*.key`; (9) Dockerfile had a non-frozen `pnpm install` fallback; (10) retention/GDPR existed only in docs, no code contract.
