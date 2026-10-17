@@ -1,0 +1,4 @@
+import { newRequestId, signManifest, generateEd25519KeyPair, hashContent } from "@agentguard/shared";
+import { store } from "@/server/store";
+import { ok, actorFromHeaders } from "@/lib/api";
+export async function POST(req: Request){ const rid=req.headers.get("x-request-id")??newRequestId(); const a=actorFromHeaders(req.headers); const rows=store.audit.filter(r=>r.orgId===a.orgId); const json=JSON.stringify(rows,null,2); const csv="id,seq,action,createdAt\n"+rows.map(r=>[r.id,r.seq,r.action,r.createdAt].join(",")).join("\n"); const files=[{name:"audit.json",sha256:hashContent(json)},{name:"audit.csv",sha256:hashContent(csv)}]; const kp=generateEd25519KeyPair(); const manifest=signManifest(files, kp.privateKey, kp.publicKey); store.appendAudit(a.orgId,"evidence_pack.generated",{files:files.map(f=>f.name)}); return ok({ manifest, files: { "audit.json": json, "audit.csv": csv } }, rid); }

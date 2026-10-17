@@ -1,0 +1,4 @@
+import { authorize, newRequestId, ApiError } from "@agentguard/shared";
+import { store } from "@/server/store";
+import { ok, err, actorFromHeaders } from "@/lib/api";
+export async function POST(req: Request, ctx: { params: { id: string } }){ const rid=req.headers.get("x-request-id")??newRequestId(); try{ const a=actorFromHeaders(req.headers); authorize({userId:a.userId,orgId:a.orgId,role:a.role as never},"agents:write",{orgId:a.orgId}); const ag=store.agents.get(ctx.params.id); if(!ag) return err("NOT_FOUND","Agent not found",rid,404); if(ag.orgId!==a.orgId) return err("FORBIDDEN","Cross-tenant access denied",rid,403); ag.status="quarantined"; store.appendAudit(a.orgId,"agent.quarantined",{agentId:ag.id}); return ok({ agent: ag }, rid); }catch(e){ if(e instanceof ApiError) return err(e.code,e.message,rid,e.status); return err("INTERNAL_ERROR", e instanceof Error?e.message:"error", rid, 500); } }
