@@ -1,0 +1,1 @@
+export default function Page(){ return (<div><h1 style={{fontSize:28}}>Agent Detail</h1><p style={{color:"#475569",marginTop:8}}>Agent detail, keys, recent events, kill switch.</p></div>); }

@@ -1,0 +1,1 @@
+export default function Page(){ return (<div><h1 style={{fontSize:28}}>Alerts</h1><p style={{color:"#475569",marginTop:8}}>Alert rules, dedupe, snooze, acknowledge, channels.</p></div>); }
