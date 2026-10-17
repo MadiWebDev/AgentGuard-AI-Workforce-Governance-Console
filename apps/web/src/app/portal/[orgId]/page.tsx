@@ -1,0 +1,1 @@
+export default function Page({ params }: { params: { orgId: string } }){ return (<div><h1 style={{fontSize:28}}>Client Portal</h1><p style={{color:"#475569",marginTop:8}}>Client-facing portal for org {params.orgId}: only this client&apos;s reports and approvals are visible. Data is scoped server-side by org — other orgs&apos; data is never returned.</p></div>); }
