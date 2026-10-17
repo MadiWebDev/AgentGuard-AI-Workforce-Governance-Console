@@ -13,3 +13,22 @@
 - Red-team and pack policies are DRAFT-only; activation is always a separate audited human action.
 - SIEM exactly-once uses idempotency keys (siem:endpoint:event) + delivered-state dedupe, not timestamps alone.
 - Offline approval conflict resolution: first decision wins; queued conflicting decisions are reported as conflicts, never overwrite.
+
+## v1.2 decisions
+- Lockfile prep fix: regenerated via `pnpm install --lockfile-only` in /tmp copy (in-place run failed with EPERM chown in this VM); only change is @types/node@22.10.2 added to mcp-server/sdk-ts/shared importers. Clean-room frozen install now passes.
+- v1.2 adapters (env-gated, rejected in production): LocalSandbox (restricted subprocess), MockAttestationIssuer (HMAC short-lived), LocalTimestamping (hash-chained OTS-style proofs, test-only), NL authoring via deterministic parser when no AI provider key (never fabricated results).
+- Policy action `execute_in_sandbox` added to PolicyRule action union; drafts (NL/autopilot/packs) never affect policy/check until activated.
+- DP epsilon budget: total 1.0 per release window, per-query spend tracked, reject on exhaustion; Laplace noise with fixed seed in tests for determinism.
+
+## v1.2 decisions (continued)
+- Token-stream: buffered-window release semantics — tokens are released only after clearing the window; on match only pre-window tokens are released. Window default 20 tokens.
+- Sandbox: LocalSandbox env is minimal ({PATH}) via unknown-cast (web @types/node requires NODE_ENV in ProcessEnv); no-shell + argv allowlist + egress pre-check. LocalSandbox is dev/test isolation, not a security boundary.
+- Attestation: HMAC covers the raw base64url payload segment (re-serialization canonicalization bug fixed after a tampered-signature test caught Buffer.from hex truncation); signature must match /^[0-9a-f]{64}$/.
+- NL authoring: deterministic parser is the default path; AI module path only when a provider key is configured. New rule fields timeWindow + rateLimitPerMinute evaluated in ruleMatches.
+- Autopilot: loosen threshold default 5 approvals (all approved); tighten from drift findings; proposals are drafts; activation is versioned + audited.
+- Collusion: heuristic detective control (session/exfil grouping), not a preventive guarantee; FPR measured on seeded normal traffic.
+- Anchoring: Ed25519 local proofs carry their own public key for offline verification; OTS/EVM are NOT_CONFIGURED adapters.
+- Compliance: store checkpoint root is a SHA-256 over audit row hashes at creation; hasCheckpoint re-verifies the first N rows.
+- Benchmarking: epsilon total 1.0/window, 0.25/query; seeded mulberry32 RNG in tests for determinism; production callers should seed from crypto randomness.
+- Lineage: lineageHash binds lineage into the signed manifest via a lineage.json manifest entry.
+- Lockfile prep fix (v1.2-prep): see v1.2 start in PROGRESS.md.

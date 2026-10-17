@@ -32,3 +32,16 @@ Error format: { error: { code, message, details, request_id } }. Deprecation: v1
 - GET /api/v1/packs, POST /api/v1/packs/install, POST /api/v1/packs/activate.
 - POST /api/v1/push/subscribe — {userId, endpoint, payload?} (mock push in dev/test).
 - Error format unchanged: {error:{code,message,details,request_id}}.
+
+## v1.2 endpoints
+- POST /api/v1/gateway/stream-inspect — {tokens[], windowTokens?, guardPolicies[{id, pattern}]} → {terminated, outputTokens, matchedRuleId, redactedTranscript, guardrailEvent}.
+- POST /api/v1/sandbox/execute — {command, args?, stdin?, egressAllowlist?, timeoutMs?} → {stdout, stderr, exitCode, killedByLimit, blocked, blockReason, evidence}.
+- POST /api/v1/attestation/issue, /api/v1/attestation/verify — mock attestation (test-only; rejected in production; SPIRE in production).
+- POST /api/v1/policies/draft-from-nl — {utterance, recentEvents?} → {policy (draft), explanation, simulation}. Drafts never affect policy/check until activated.
+- POST /api/v1/autopilot/run — {decisions, driftFindings?} → {proposals}. POST /api/v1/autopilot/activate — {proposal, approvers} → {policy (active), audit}; two-person required when loosening a deny-class rule.
+- POST /api/v1/collusion/detect — {traces, autoQuarantine?} → {alerts, quarantinedAgentIds, audit}.
+- POST /api/v1/anchoring/anchor — {manifest} → {proof, status}. Proof verifies offline from the pack alone.
+- POST /api/v1/compliance/run, GET /api/v1/compliance/controls — control tests + 30-day history + pass rate.
+- POST /api/v1/benchmarks/publish — {orgs, epsilonPerQuery?} → {aggregates, epsilonSpent, budgetAfter}; DP budget exhaustion → 429 DP_BUDGET_EXHAUSTED.
+- POST /api/v1/lineage/diff — {old, new} → {changedFields, changes, summary}.
+- Error format unchanged: {error:{code,message,details,request_id}}.
