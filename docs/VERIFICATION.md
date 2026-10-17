@@ -40,3 +40,21 @@ Manual verification required: live Paddle/Neon/Cloudinary/R2/Upstash/Inngest/Res
 - KMS down: fail-closed for new encryptions, reads continue (design + adapter NOT_CONFIGURED behavior; no live KMS in VM).
 - SIEM down: buffered/retried/never lost (v11 F7 test: buffered → retryBuffered → delivered).
 - Push down: fallback email (documented in RUNBOOK.md; mock push in dev/test).
+
+## v1.2 verification (R29–R38)
+- R29 Token-stream (A1): golden A1 + v12 A1 PASS (stream cut within window, disallowed text never in full, guardrail event + rule id + redacted transcript; overhead 0.45 ms/call measured).
+- R30 Sandbox (A2): golden A2 + v12 A2 PASS (egress block pre-execution, timeout kill, evidence capture, Docker NOT_CONFIGURED). Docker/Firecracker live execution UNVERIFIED (no Docker in VM).
+- R31 Attestation (A3): golden A3 + v12 A3 PASS (stolen-key replay denied + audited, expiry forces re-issuance, tampered signature fails after HMAC-segment fix, issuer-down follows fail-mode, SPIRE NOT_CONFIGURED).
+- R32 NL authoring (A4): golden A4 + v12 A4 PASS (5 utterances -> valid drafts, simulation diffs, weekend rule fires Sat not Mon, draft cannot affect policy/check).
+- R33 Autopilot (A5): golden A5 + v12 A5 PASS (37-approval history -> proposal with evidenceCount 37 in unit test; golden uses 10; two-person rule enforced; never auto-activates; activation versioned + audited).
+- R34 Collusion (A6): golden A6 + v12 A6 PASS (chunked + split-bypass alerts name all agents, reconstructed sequences, opt-in auto-quarantine, FPR 0 on 50 normal traces).
+- R35 Anchoring (A7): golden A7 + v12 A7 PASS (anchor + offline pack verification, tampered root fails, queue/retry/pending never silently skipped, OTS NOT_CONFIGURED). Live OTS/EVM anchoring UNVERIFIED (no live chain in VM).
+- R36 Compliance (A8): golden A8 + v12 A8 PASS (4 controls, history, 30-day window, broken control flips to fail + alert; store checkpoint + probe are real, not tautological).
+- R37 Benchmarking (A9): v12 A9 PASS (opted-out exclusion identical output, remove-one-org delta within sensitivity/epsilon bound, budget accounting + exhaustion rejects). No golden check by design (DP randomness) — unit tests cover it.
+- R38 Lineage (A10): golden A10 + v12 A10 PASS (prompt-upgrade diff entry, lineage attaches to traces, pack contains lineage block and verifies, tampered lineage fails).
+- R1–R28: re-verified via verify:all (golden 20/20 v1 + 15/15 v1.1 + 9/9 v1.2 checks + tests) in the same run.
+
+## v1.2 chaos rows
+- Sandbox provider down: fail-closed for sandbox actions, clear error (Docker/Firecracker NOT_CONFIGURED behavior; live provider failure UNVERIFIED without Docker).
+- Attestation issuer down: fail per agent fail-mode (v12 A3 test: fail-open allows + audits, fail-closed denies).
+- Timestamping service down: anchor queued, retried, marked pending — never silently skipped (v12 A7 test).
