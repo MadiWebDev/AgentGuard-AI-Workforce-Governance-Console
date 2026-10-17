@@ -1,0 +1,1 @@
+export default function Page(){ return (<div><h1 style={{fontSize:28}}>Policies</h1><p style={{color:"#475569",marginTop:8}}>Policy engine: rules, versioning, simulation, diff + rollback.</p></div>); }

@@ -1,0 +1,1 @@
+export default function Page(){ return (<div><h1 style={{fontSize:28}}>Security</h1><p style={{color:"#475569",marginTop:8}}>See docs/SECURITY.md for STRIDE threat model. Security.txt at /.well-known/security.txt.</p></div>); }

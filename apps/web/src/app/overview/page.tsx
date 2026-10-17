@@ -1,0 +1,1 @@
+export default function Page(){ return (<div><h1 style={{fontSize:28}}>Overview</h1><p style={{color:"#475569",marginTop:8}}>Spend, reliability, approvals pending, recent traces. Demo data — wire to /api/v1/costs/summary in production.</p></div>); }

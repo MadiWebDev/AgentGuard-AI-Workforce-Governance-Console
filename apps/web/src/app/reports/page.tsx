@@ -1,0 +1,1 @@
+export default function Page(){ return (<div><h1 style={{fontSize:28}}>Reports</h1><p style={{color:"#475569",marginTop:8}}>Client-proof reporting: workspaces, reconciliation, share links, PDF export.</p></div>); }
