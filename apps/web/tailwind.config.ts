@@ -1,2 +1,75 @@
 import type { Config } from "tailwindcss";
-export default { content: ["./src/**/*.{ts,tsx}"], theme: { extend: { colors: { ink: "#0f172a" } } }, plugins: [] } satisfies Config;
+
+/** M3 token -> Tailwind utility mapping. Tokens live in globals.css as CSS vars. */
+const m3 = (name: string) => `var(--m3-${name})`;
+export default {
+  content: ["./src/**/*.{ts,tsx}"],
+  theme: {
+    extend: {
+      colors: {
+        ink: "#0f172a",
+        primary: m3("primary"),
+        "on-primary": m3("on-primary"),
+        "primary-container": m3("primary-container"),
+        "on-primary-container": m3("on-primary-container"),
+        secondary: m3("secondary"),
+        "on-secondary": m3("on-secondary"),
+        "secondary-container": m3("secondary-container"),
+        "on-secondary-container": m3("on-secondary-container"),
+        tertiary: m3("tertiary"),
+        "on-tertiary": m3("on-tertiary"),
+        "tertiary-container": m3("tertiary-container"),
+        "on-tertiary-container": m3("on-tertiary-container"),
+        error: m3("error"),
+        "on-error": m3("on-error"),
+        "error-container": m3("error-container"),
+        "on-error-container": m3("on-error-container"),
+        surface: m3("surface"),
+        "on-surface": m3("on-surface"),
+        "on-surface-variant": m3("on-surface-variant"),
+        "surface-variant": m3("surface-variant"),
+        "surface-container-lowest": m3("surface-container-lowest"),
+        "surface-container-low": m3("surface-container-low"),
+        "surface-container": m3("surface-container"),
+        "surface-container-high": m3("surface-container-high"),
+        "surface-container-highest": m3("surface-container-highest"),
+        outline: m3("outline"),
+        "outline-variant": m3("outline-variant"),
+        "inverse-surface": m3("inverse-surface"),
+        "inverse-on-surface": m3("inverse-on-surface"),
+        "inverse-primary": m3("inverse-primary"),
+        success: m3("success"),
+        "success-container": m3("success-container"),
+        warning: m3("warning"),
+        "warning-container": m3("warning-container"),
+      },
+      borderRadius: {
+        "m3-xs": "var(--m3-radius-xs)",
+        "m3-sm": "var(--m3-radius-sm)",
+        "m3-md": "var(--m3-radius-md)",
+        "m3-lg": "var(--m3-radius-lg)",
+        "m3-xl": "var(--m3-radius-xl)",
+        "m3-full": "var(--m3-radius-full)",
+      },
+      boxShadow: {
+        "elevation-1": "var(--m3-elevation-1)",
+        "elevation-2": "var(--m3-elevation-2)",
+        "elevation-3": "var(--m3-elevation-3)",
+        "elevation-4": "var(--m3-elevation-4)",
+        "elevation-5": "var(--m3-elevation-5)",
+      },
+      fontFamily: {
+        sans: ["Inter", "Plus Jakarta Sans", "ui-sans-serif", "system-ui", "sans-serif"],
+        mono: ["IBM Plex Mono", "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
+      },
+      screens: {
+        xs: "360px",
+        sm: "768px",
+        md: "1024px",
+        lg: "1440px",
+        xl: "1920px",
+      },
+    },
+  },
+  plugins: [],
+} satisfies Config;
