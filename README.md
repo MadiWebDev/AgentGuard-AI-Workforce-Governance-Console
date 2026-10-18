@@ -4,6 +4,8 @@ Log every agent action, enforce permissions and human approvals, track cost and 
 
 **Current version: 1.4.0** — v1 core + v1.1 enterprise expansion + v1.2 autonomous governance & deep trust + v1.3 ecosystem & growth + v1.4 Material Design 3 redesign.
 
+> Contributing? See [CONTRIBUTING.md](CONTRIBUTING.md) and our [Code of Conduct](CODE_OF_CONDUCT.md).
+
 ## What it does
 
 **The golden path (the one thing that must work perfectly):** an agent calls `policy/check` and is allowed, denied, or held for human approval; every action is ingested with PII redacted; every decision lands in a hash-chained audit log; a reviewer can approve or reject; and an auditor can export and independently verify a signed evidence pack.
